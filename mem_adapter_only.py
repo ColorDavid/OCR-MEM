@@ -25,10 +25,10 @@ class MEMConfig(PretrainedConfig):
     
     def __init__(
         self, 
-        base_model_name="",
-        ocr_model_name="",
-        vision_embedding_size=512,
-        context_threshold=2048,
+        base_model_name: str = "",
+        ocr_model_name: str = "",
+        vision_embedding_size: int = 512,
+        context_threshold: int = 2048,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -36,6 +36,12 @@ class MEMConfig(PretrainedConfig):
         self.ocr_model_name = ocr_model_name
         self.vision_embedding_size = vision_embedding_size
         self.context_threshold = context_threshold
+        
+        # 验证必要参数
+        if not base_model_name:
+            logging.warning("base_model_name is empty, model may not initialize correctly")
+        if not ocr_model_name:
+            logging.warning("ocr_model_name is empty, model may not initialize correctly")
 
 
 class MEMModel(PreTrainedModel):
@@ -43,8 +49,13 @@ class MEMModel(PreTrainedModel):
     带有视觉记忆压缩的模型
     
     在每个user消息位置检查历史长度，如果超过阈值则进行视觉压缩增强。
+    支持DeepSpeed ZeRO优化和HuggingFace Trainer。
     """
     config_class = MEMConfig
+    base_model_prefix = "base_model"
+    supports_gradient_checkpointing = True
+    _no_split_modules = ["proj"]
+    _skip_keys_device_placement = ["past_key_values"]
 
     def __init__(self, config: MEMConfig):
         super().__init__(config)
@@ -74,42 +85,162 @@ class MEMModel(PreTrainedModel):
             param.requires_grad = False
         
         # 投影层：将视觉特征投影到语言模型的隐藏空间
+        # 使用与base_model相同的dtype确保一致性
         mlp_hidden_dim = max(config.vision_embedding_size, self.base_model_config.hidden_size)
         self.proj = nn.Sequential(
-            nn.Linear(config.vision_embedding_size, mlp_hidden_dim),
+            nn.Linear(config.vision_embedding_size, mlp_hidden_dim, dtype=torch.bfloat16),
             nn.GELU(),
-            nn.Linear(mlp_hidden_dim, self.base_model_config.hidden_size)
+            nn.Linear(mlp_hidden_dim, self.base_model_config.hidden_size, dtype=torch.bfloat16)
+        )
+        
+        # 初始化投影层权重
+        self._init_proj_weights()
+
+    def _init_proj_weights(self):
+        """初始化投影层权重"""
+        for module in self.proj:
+            if isinstance(module, nn.Linear):
+                nn.init.normal_(module.weight, mean=0.0, std=0.02)
+                if module.bias is not None:
+                    nn.init.zeros_(module.bias)
+
+    def get_input_embeddings(self):
+        """返回输入嵌入层"""
+        return self.base_model.get_input_embeddings()
+
+    def set_input_embeddings(self, value):
+        """设置输入嵌入层"""
+        self.base_model.set_input_embeddings(value)
+
+    def get_output_embeddings(self):
+        """返回输出嵌入层（用于语言模型头）"""
+        return self.base_model.get_output_embeddings()
+
+    def set_output_embeddings(self, new_embeddings):
+        """设置输出嵌入层"""
+        self.base_model.set_output_embeddings(new_embeddings)
+
+    def gradient_checkpointing_enable(self, gradient_checkpointing_kwargs=None):
+        """启用梯度检查点以节省内存"""
+        self.base_model.gradient_checkpointing_enable(gradient_checkpointing_kwargs)
+
+    def gradient_checkpointing_disable(self):
+        """禁用梯度检查点"""
+        self.base_model.gradient_checkpointing_disable()
+
+    @property
+    def is_gradient_checkpointing(self) -> bool:
+        """检查是否启用了梯度检查点"""
+        return getattr(self.base_model, "is_gradient_checkpointing", False)
+
+    def train(self, mode: bool = True):
+        """
+        设置训练模式，确保冻结的模块保持eval状态
+        """
+        super().train(mode)
+        # 保持base_model和ocr_embed为eval模式
+        self.base_model.eval()
+        self.ocr_embed.eval()
+        # 只有proj层参与训练
+        if mode:
+            self.proj.train()
+        return self
+
+    def get_trainable_parameters(self) -> List[nn.Parameter]:
+        """返回可训练参数列表（用于优化器）"""
+        return [p for p in self.proj.parameters() if p.requires_grad]
+
+    def print_trainable_parameters(self):
+        """打印可训练参数统计"""
+        trainable_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
+        all_params = sum(p.numel() for p in self.parameters())
+        print(
+            f"trainable params: {trainable_params:,} || "
+            f"all params: {all_params:,} || "
+            f"trainable%: {100 * trainable_params / all_params:.4f}%"
         )
 
     @classmethod
-    def from_pretrained(cls, pretrained_model_name_or_path, *args, **kwargs):
-        """从预训练路径加载模型"""
-        config_path = Path(pretrained_model_name_or_path) / "config.json"
+    def from_pretrained(
+        cls, 
+        pretrained_model_name_or_path: str, 
+        *model_args,
+        config: Optional[MEMConfig] = None,
+        **kwargs
+    ):
+        """
+        从预训练路径加载模型
         
-        if config_path.exists():
-            with open(config_path, 'r') as f:
-                config_dict = json.load(f)
-            config = MEMConfig(**config_dict)
-        else:
-            raise ValueError(f"Config file not found at {config_path}")
+        Args:
+            pretrained_model_name_or_path: 模型保存路径
+            config: 可选的配置对象，如果提供则使用此配置
+            **kwargs: 传递给模型初始化的其他参数
+        """
+        pretrained_path = Path(pretrained_model_name_or_path)
+        config_path = pretrained_path / "config.json"
         
+        # 加载或使用提供的配置
+        if config is None:
+            if config_path.exists():
+                with open(config_path, 'r') as f:
+                    config_dict = json.load(f)
+                config = MEMConfig(**config_dict)
+            else:
+                raise ValueError(f"Config file not found at {config_path}")
+        
+        # 处理kwargs中的设备和dtype参数
+        device_map = kwargs.pop("device_map", None)
+        torch_dtype = kwargs.pop("torch_dtype", None)
+        
+        # 创建模型实例
         model = cls(config)
         
         # 加载投影层权重
-        proj_path = Path(pretrained_model_name_or_path) / "projection_layer.pt"
+        proj_path = pretrained_path / "projection_layer.pt"
         if proj_path.exists():
-            proj_state_dict = torch.load(proj_path, map_location="cpu")
+            proj_state_dict = torch.load(proj_path, map_location="cpu", weights_only=True)
             model.proj.load_state_dict(proj_state_dict)
+            logging.info(f"Loaded projection layer from {proj_path}")
+        else:
+            logging.warning(f"Projection layer weights not found at {proj_path}, using initialized weights")
+        
+        # 处理设备映射（DeepSpeed兼容）
+        if device_map is not None:
+            model = model.to(device_map) if isinstance(device_map, (str, torch.device)) else model
+        
+        # 处理dtype转换
+        if torch_dtype is not None:
+            model.proj = model.proj.to(dtype=torch_dtype)
         
         return model
 
-    def save_pretrained(self, save_directory, **kwargs):
-        """保存模型到指定目录"""
+    def save_pretrained(
+        self, 
+        save_directory: str, 
+        is_main_process: bool = True,
+        state_dict: Optional[dict] = None,
+        save_function: callable = torch.save,
+        **kwargs
+    ):
+        """
+        保存模型到指定目录
+        
+        Args:
+            save_directory: 保存目录路径
+            is_main_process: 是否为主进程（DeepSpeed/分布式训练）
+            state_dict: 可选的state_dict，如果提供则使用此dict
+            save_function: 保存函数，默认为torch.save
+            **kwargs: 其他参数
+        """
+        if not is_main_process:
+            return
+        
         save_directory = Path(save_directory)
         save_directory.mkdir(parents=True, exist_ok=True)
         
-        # 保存配置
+        # 保存配置（包含model_type）
         config_dict = {
+            "model_type": self.config.model_type,
             "base_model_name": self.config.base_model_name,
             "ocr_model_name": self.config.ocr_model_name,
             "vision_embedding_size": self.config.vision_embedding_size,
@@ -120,9 +251,19 @@ class MEMModel(PreTrainedModel):
             json.dump(config_dict, f, indent=2)
         
         # 只保存投影层的权重（base_model和ocr_embed保持冻结）
-        torch.save(self.proj.state_dict(), save_directory / "projection_layer.pt")
+        if state_dict is not None:
+            # 从完整state_dict中提取proj相关的权重
+            proj_state_dict = {
+                k.replace("proj.", ""): v 
+                for k, v in state_dict.items() 
+                if k.startswith("proj.")
+            }
+        else:
+            proj_state_dict = self.proj.state_dict()
         
-        print(f"Model saved to {save_directory}")
+        save_function(proj_state_dict, save_directory / "projection_layer.pt")
+        
+        logging.info(f"Model saved to {save_directory}")
 
     def forward(
         self,
@@ -192,15 +333,27 @@ class MEMModel(PreTrainedModel):
             history_ids = input_ids[b, :last_assistant_pos]
             history_text = self.tokenizer.decode(history_ids, skip_special_tokens=False)
             
-            # 2. 将文本渲染为图像
-            images = self.render_func(history_text)  # 返回PIL.Image列表
+            # 2. 将文本渲染为图像（可能返回多张图片的列表）
+            images = self.render_func(history_text)
+            if not isinstance(images, list):
+                images = [images]
             
-            # 3. 通过OCR编码器提取视觉特征
+            # 3. 通过OCR编码器提取每张图像的视觉特征并拼接
+            vision_features_list = []
             with torch.no_grad():
-                vision_features = self.ocr_embed(images)  # [1, vision_embedding_size]
+                for img in images:
+                    # OCR编码: [num_tokens, vision_embedding_size]
+                    img_features = self.ocr_embed(img)
+                    # 确保维度正确：如果是1D则添加batch维度
+                    if img_features.dim() == 1:
+                        img_features = img_features.unsqueeze(0)
+                    vision_features_list.append(img_features)
             
-            # 4. 投影到语言模型的隐藏空间
-            vision_embeds = self.proj(vision_features)  # [1, hidden_size]
+            # 拼接所有图像的特征: [total_tokens, vision_embedding_size]
+            vision_features = torch.cat(vision_features_list, dim=0)
+            
+            # 4. 投影到语言模型的隐藏空间: [total_tokens, hidden_size]
+            vision_embeds = self.proj(vision_features)
             
             # 5. 提取保留部分（last_assistant_pos到结尾）
             remaining_embeds = inputs_embeds[b, last_assistant_pos:]  # [remaining_len, hidden_size]
