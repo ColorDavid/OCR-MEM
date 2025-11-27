@@ -8,71 +8,122 @@ from transformers import (
     GenerationConfig
 )
 from transformers.modeling_outputs import CausalLMOutputWithPast
+from transformers import PretrainedConfig, PreTrainedModel
 from peft import PeftConfig, LoraConfig
 
 import random
 from typing import Tuple, Optional, List, Union
 import logging
+from pathlib import Path
+import json
 from utils.render import text_to_images
 from deepseek_ocr_encoder import DeepSeekOCREncoder
 
-from transformers.modeling_utils import PreTrainedModel
 
-@registry.register_model("memmodel")
+class MEMConfig(PretrainedConfig):
+    model_type = "mem_model"
+    
+    def __init__(
+        self, 
+        base_model_name="",
+        ocr_model_name="",
+        vision_embedding_size=512,
+        context_threshold=2048,
+        **kwargs
+    ):
+        super().__init__(**kwargs)
+        self.base_model_name = base_model_name
+        self.ocr_model_name = ocr_model_name
+        self.vision_embedding_size = vision_embedding_size
+        self.context_threshold = context_threshold
+
+
 class MEMModel(PreTrainedModel):
     """
     带有视觉记忆压缩的模型
     
     在每个user消息位置检查历史长度，如果超过阈值则进行视觉压缩增强。
     """
+    config_class = MEMConfig
 
-    def __init__(
-        self, 
-        base_model_name: str, 
-        ocr_model_name: str,
-        vision_embedding_size: int = 512,
-        context_threshold: int = 2048,
-        **kwargs
-    ):   
-        super().__init__()
+    def __init__(self, config: MEMConfig):
+        super().__init__(config)
         
         # 基础语言模型
         self.base_model = AutoModelForCausalLM.from_pretrained(
-            base_model_name, 
+            config.base_model_name, 
             torch_dtype=torch.bfloat16, 
             attn_implementation="flash_attention_2"
         )
-        self.tokenizer = AutoTokenizer.from_pretrained(base_model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(config.base_model_name)
         self.base_model_config = self.base_model.config
         
         # 全局配置参数
-        self.context_threshold = context_threshold
+        self.context_threshold = config.context_threshold
 
         # 文本到图像渲染函数
         self.render_func = text_to_images
         
         # OCR视觉编码器
-        self.ocr_embed = DeepSeekOCREncoder.from_pretrained(ocr_model_name)
+        self.ocr_embed = DeepSeekOCREncoder.from_pretrained(config.ocr_model_name)
+        
+        # 冻结base_model和ocr_embed
+        for param in self.base_model.parameters():
+            param.requires_grad = False
+        for param in self.ocr_embed.parameters():
+            param.requires_grad = False
         
         # 投影层：将视觉特征投影到语言模型的隐藏空间
-        mlp_hidden_dim = max(vision_embedding_size, self.base_model_config.hidden_size)
+        mlp_hidden_dim = max(config.vision_embedding_size, self.base_model_config.hidden_size)
         self.proj = nn.Sequential(
-            nn.Linear(vision_embedding_size, mlp_hidden_dim),
+            nn.Linear(config.vision_embedding_size, mlp_hidden_dim),
             nn.GELU(),
             nn.Linear(mlp_hidden_dim, self.base_model_config.hidden_size)
         )
 
-    
     @classmethod
-    def from_config(cls, config: dict):
-        """从配置字典创建模型实例"""
-        return cls(
-            base_model_name=config.get("base_model_name"),
-            ocr_model_name=config.get("ocr_model_name"),
-            vision_embedding_size=config.get("vision_embedding_size"),
-            context_threshold=config.get("context_threshold", 2048),
-        )
-    
+    def from_pretrained(cls, pretrained_model_name_or_path, *args, **kwargs):
+        """从预训练路径加载模型"""
+        config_path = Path(pretrained_model_name_or_path) / "config.json"
+        
+        if config_path.exists():
+            with open(config_path, 'r') as f:
+                config_dict = json.load(f)
+            config = MEMConfig(**config_dict)
+        else:
+            raise ValueError(f"Config file not found at {config_path}")
+        
+        model = cls(config)
+        
+        # 加载投影层权重
+        proj_path = Path(pretrained_model_name_or_path) / "projection_layer.pt"
+        if proj_path.exists():
+            proj_state_dict = torch.load(proj_path, map_location="cpu")
+            model.proj.load_state_dict(proj_state_dict)
+        
+        return model
+
+    def save_pretrained(self, save_directory, **kwargs):
+        """保存模型到指定目录"""
+        save_directory = Path(save_directory)
+        save_directory.mkdir(parents=True, exist_ok=True)
+        
+        # 保存配置
+        config_dict = {
+            "base_model_name": self.config.base_model_name,
+            "ocr_model_name": self.config.ocr_model_name,
+            "vision_embedding_size": self.config.vision_embedding_size,
+            "context_threshold": self.config.context_threshold,
+        }
+        
+        with open(save_directory / "config.json", 'w') as f:
+            json.dump(config_dict, f, indent=2)
+        
+        # 只保存投影层的权重（base_model和ocr_embed保持冻结）
+        torch.save(self.proj.state_dict(), save_directory / "projection_layer.pt")
+        
+        print(f"Model saved to {save_directory}")
+
     def forward(
         self,
         input_ids: torch.Tensor,
@@ -142,7 +193,7 @@ class MEMModel(PreTrainedModel):
             history_text = self.tokenizer.decode(history_ids, skip_special_tokens=False)
             
             # 2. 将文本渲染为图像
-            images = self.render_func([history_text])  # 返回PIL.Image列表
+            images = self.render_func(history_text)  # 返回PIL.Image列表
             
             # 3. 通过OCR编码器提取视觉特征
             with torch.no_grad():
@@ -243,4 +294,3 @@ class MEMModel(PreTrainedModel):
         )
         
         return outputs
-            
