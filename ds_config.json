@@ -1,0 +1,45 @@
+{
+    "_comment": "============================================================",
+    "_comment_1": "DeepSpeed ZeRO-2 配置文件",
+    "_comment_2": "适用于 MEMModel Adapter 训练",
+    "_comment_3": "============================================================",
+    "_comment_4": "使用方法: deepspeed --num_gpus=4 run_training.py --deepspeed ds_config.json",
+    "_comment_5": "============================================================",
+
+    "train_batch_size": "auto",
+    "train_micro_batch_size_per_gpu": "auto",
+    "gradient_accumulation_steps": "auto",
+
+    "bf16": {
+        "enabled": true
+    },
+
+    "fp16": {
+        "enabled": false
+    },
+
+    "zero_optimization": {
+        "stage": 2,
+
+        "offload_optimizer": {
+            "device": "cpu",
+            "pin_memory": true,
+            "buffer_count": 4,
+            "fast_init": false
+        },
+
+        "allgather_partitions": true,
+        "allgather_bucket_size": 500000000,
+
+        "reduce_scatter": true,
+        "reduce_bucket_size": 500000000,
+
+        "overlap_comm": true,
+        "contiguous_gradients": true
+    },
+
+    "gradient_clipping": 1.0,
+
+    "steps_per_print": 10,
+    "wall_clock_breakdown": false
+}

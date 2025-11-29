@@ -42,7 +42,7 @@ RAW_RENDER_CONFIG = {
       "page-bg-color": "#FFFFFF",
       "para-bg-color": "#FFFFFF",
       "auto-crop-width": True,
-      "auto-crop-last-page": Fallsese,
+      "auto-crop-last-page": False,
 }
 
 
