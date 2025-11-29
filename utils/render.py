@@ -21,6 +21,31 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT, TA_JUSTIFY
 from reportlab.lib import colors
 
+RAW_RENDER_CONFIG = {
+      "page-size": "1280,1280",
+      "dpi": 72,
+      "margin-x": 10,
+      "margin-y": 10,
+      "font-path": "./fonts/Verdana.ttf",
+      "font-size": 9,
+      "line-height": 10,
+      "font-color": "#000000",
+      "alignment": "LEFT",
+      "horizontal-scale": 1.0,
+      "first-line-indent": 0,
+      "left-indent": 0,
+      "right-indent": 0,
+      "space-after": 0,
+      "space-before": 0,
+      "border-width": 0,
+      "border-padding": 0,
+      "page-bg-color": "#FFFFFF",
+      "para-bg-color": "#FFFFFF",
+      "auto-crop-width": True,
+      "auto-crop-last-page": Fallsese,
+}
+
+
 # Alignment mapping
 ALIGN_MAP = {
     "LEFT": TA_LEFT,
@@ -62,7 +87,7 @@ def load_config(config_path):
 
 
 
-def text_to_images(text, config_path=None, config_dict=None):
+def text_to_images(text, config_path=None, config_dict=RAW_RENDER_CONFIG):
     """
     Convert text to images - Returns PIL Image objects directly
     
