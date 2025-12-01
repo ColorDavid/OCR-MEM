@@ -40,23 +40,23 @@ echo "============================================================"
 
 # -------------------- 模型路径（本地路径）--------------------
 # 基础语言模型路径
-export BASE_MODEL_PATH="./models/qwen2.5-1.5b-instruct"
+export BASE_MODEL_PATH="/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B"
 
 # OCR 编码器路径
-export OCR_MODEL_PATH="./models/deepseek-ocr"
+export OCR_MODEL_PATH="/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR"
 
 # -------------------- 数据路径 --------------------
 # 训练数据
-export TRAIN_DATA="./data/train.jsonl"
+export TRAIN_DATA="/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl"
 
 # 验证数据（可选）
-export EVAL_DATA="./data/eval.jsonl"
+export EVAL_DATA="/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl"
 
 # -------------------- 输出目录 --------------------
-export OUTPUT_DIR="./output/adapter_checkpoints"
+export OUTPUT_DIR="./adapter_checkpoints"
 
 # -------------------- 训练超参数 --------------------
-export NUM_EPOCHS=3
+export NUM_EPOCHS=2
 export BATCH_SIZE=2
 export GRADIENT_ACCUMULATION=8
 export LEARNING_RATE=2e-4

@@ -1,3 +1,4 @@
 # 忽略 data 和 model 文件夹
 data/
 model/
+checkpoints/
