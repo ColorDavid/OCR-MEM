@@ -77,10 +77,10 @@ export LEARNING_RATE=2e-4
 
 # -------------------- GPU 配置 --------------------
 # 指定使用的 GPU（例如 "0,1,2,3"）
-export CUDA_VISIBLE_DEVICES="0,1,2,3"
+# export CUDA_VISIBLE_DEVICES="0,1,2,3"
 
 # GPU 数量（与 CUDA_VISIBLE_DEVICES 中的数量一致）
-export NUM_GPUS=4
+export NUM_GPUS=8
 
 # 分布式训练端口（如有冲突请修改）
 export MASTER_PORT=29500
