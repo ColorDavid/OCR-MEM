@@ -66,6 +66,13 @@ from typing import Optional
 import torch
 import torch.distributed as dist
 
+try:
+    import wandb
+    WANDB_AVAILABLE = True
+except ImportError:
+    WANDB_AVAILABLE = False
+    print("警告: wandb 未安装，将禁用 wandb 日志")
+
 from transformers import TrainingArguments
 
 # 添加项目根目录到 Python 路径
@@ -116,8 +123,11 @@ TRAINING_CONFIG = {
     # 输出目录
     "output_dir": "./output/adapter_checkpoints",
     
-    # 实验名称（用于日志和 TensorBoard）
+    # 实验名称（用于日志和 WandB）
     "run_name": "mem_adapter_training",
+    
+    # WandB 项目名称
+    "wandb_project": "OCR-MEM",
     
     # 训练轮数
     "num_train_epochs": 3,
@@ -443,6 +453,25 @@ def main():
         help="分布式训练的 local rank（由 DeepSpeed 自动设置）"
     )
     
+    # WandB 配置
+    parser.add_argument(
+        "--wandb_project", 
+        type=str, 
+        default=None,
+        help="WandB 项目名称"
+    )
+    parser.add_argument(
+        "--wandb_run_name", 
+        type=str, 
+        default=None,
+        help="WandB 实验名称"
+    )
+    parser.add_argument(
+        "--disable_wandb", 
+        action="store_true",
+        help="禁用 WandB 日志"
+    )
+    
     args = parser.parse_args()
     
     # ==================== 合并配置 ====================
@@ -457,6 +486,11 @@ def main():
     batch_size = args.batch_size or TRAINING_CONFIG["per_device_train_batch_size"]
     learning_rate = args.learning_rate or TRAINING_CONFIG["learning_rate"]
     gradient_accumulation = args.gradient_accumulation or TRAINING_CONFIG["gradient_accumulation_steps"]
+    
+    # WandB 配置
+    wandb_project = args.wandb_project or TRAINING_CONFIG.get("wandb_project", "OCR-MEM")
+    wandb_run_name = args.wandb_run_name or TRAINING_CONFIG["run_name"]
+    use_wandb = WANDB_AVAILABLE and not args.disable_wandb
     
     # ==================== 验证路径 ====================
     print(f"\n{'='*60}")
@@ -561,14 +595,42 @@ def main():
         # 其他配置
         dataloader_num_workers=TRAINING_CONFIG["dataloader_num_workers"],
         remove_unused_columns=False,
-        report_to=["tensorboard"],
+        report_to=["wandb", "tensorboard"] if use_wandb else ["tensorboard"],
         seed=TRAINING_CONFIG["seed"],
         
         # 适配器配置
         save_adapter_only=True,
     )
     
-    print(f"✓ 训练轮数: {num_epochs}")
+    # ==================== 初始化 WandB ====================
+    if use_wandb:
+        # 只在主进程初始化 wandb
+        local_rank = int(os.environ.get("LOCAL_RANK", -1))
+        if local_rank <= 0:
+            print(f"\n{'='*60}")
+            print("初始化 WandB")
+            print(f"{'='*60}\n")
+            
+            wandb.init(
+                project=wandb_project,
+                name=wandb_run_name,
+                config={
+                    "base_model": base_model_path,
+                    "ocr_model": ocr_model_path,
+                    "num_epochs": num_epochs,
+                    "batch_size": batch_size,
+                    "gradient_accumulation": gradient_accumulation,
+                    "learning_rate": learning_rate,
+                    "max_seq_length": DATA_CONFIG["max_seq_length"],
+                    "vision_embedding_size": MODEL_CONFIG["vision_embedding_size"],
+                    "context_threshold": MODEL_CONFIG["context_threshold"],
+                },
+                reinit=True,
+            )
+            print(f"✓ WandB 项目: {wandb_project}")
+            print(f"✓ WandB 实验: {wandb_run_name}")
+    
+    print(f"\n✓ 训练轮数: {num_epochs}")
     print(f"✓ 每 GPU Batch Size: {batch_size}")
     print(f"✓ 梯度累积: {gradient_accumulation}")
     print(f"✓ 学习率: {learning_rate}")
@@ -675,6 +737,13 @@ def main():
     print(f"✓ 训练损失: {metrics.get('train_loss', 'N/A'):.4f}")
     print(f"✓ 总步数: {metrics.get('train_steps', 'N/A')}")
     print(f"{'='*60}\n")
+    
+    # 关闭 WandB
+    if use_wandb:
+        local_rank = int(os.environ.get("LOCAL_RANK", -1))
+        if local_rank <= 0:
+            wandb.finish()
+            print("✓ WandB 日志已同步完成")
 
 
 # ============================================================================

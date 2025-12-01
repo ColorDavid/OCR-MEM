@@ -38,7 +38,7 @@
         "contiguous_gradients": true
     },
 
-    "gradient_clipping": 1.0,
+    "gradient_clipping": "auto",
 
     "steps_per_print": 10,
     "wall_clock_breakdown": false

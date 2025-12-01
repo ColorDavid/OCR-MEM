@@ -26,7 +26,7 @@ RAW_RENDER_CONFIG = {
       "dpi": 72,
       "margin-x": 10,
       "margin-y": 10,
-      "font-path": "./fonts/Verdana.ttf",
+      "font-path": os.path.join(os.path.dirname(__file__), "fonts/Verdana.ttf"),
       "font-size": 9,
       "line-height": 10,
       "font-color": "#000000",

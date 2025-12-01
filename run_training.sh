@@ -3,7 +3,7 @@
 # MEMModel Adapter 训练启动脚本
 # ==============================================================================
 #
-# 本脚本提供了多种训练启动方式，请根据您的硬件环境选择合适的配置。
+# 本脚本用于多卡分布式训练，使用 DeepSpeed 或 torchrun 启动。
 #
 # 【使用方法】
 #     1. 赋予执行权限：chmod +x run_training.sh
@@ -16,7 +16,8 @@
 #     - Python 3.8+
 #     - PyTorch 2.0+
 #     - transformers 4.35+
-#     - deepspeed 0.12+ (可选，用于分布式训练)
+#     - deepspeed 0.12+
+#     - wandb
 #
 # ==============================================================================
 
@@ -37,6 +38,19 @@ echo "============================================================"
 # ==============================================================================
 # 配置区域 - 请根据您的环境修改
 # ==============================================================================
+
+# -------------------- WandB 配置 --------------------
+# WandB API Key（用于日志记录和可视化）
+export WANDB_API_KEY="c8769e5bbc8fd36df4155b757331cd139e0fc327"
+
+# WandB 项目名称
+export WANDB_PROJECT="OCR-MEM"
+
+# WandB 实验名称（可选，留空则自动生成）
+export WANDB_RUN_NAME="mem_adapter_training"
+
+# WandB 模式：online（实时同步）、offline（离线保存）、disabled（禁用）
+export WANDB_MODE="online"
 
 # -------------------- 模型路径（本地路径）--------------------
 # 基础语言模型路径
@@ -62,22 +76,24 @@ export GRADIENT_ACCUMULATION=8
 export LEARNING_RATE=2e-4
 
 # -------------------- GPU 配置 --------------------
-# 指定使用的 GPU（例如 "0,1,2,3" 或 "0"）
-export CUDA_VISIBLE_DEVICES="0"
+# 指定使用的 GPU（例如 "0,1,2,3"）
+export CUDA_VISIBLE_DEVICES="0,1,2,3"
 
 # GPU 数量（与 CUDA_VISIBLE_DEVICES 中的数量一致）
-export NUM_GPUS=1
+export NUM_GPUS=4
+
+# 分布式训练端口（如有冲突请修改）
+export MASTER_PORT=29500
 
 
 # ==============================================================================
 # 选择训练模式
 # ==============================================================================
 # 可选值：
-#   single   - 单卡训练
 #   deepspeed - DeepSpeed 多卡训练（推荐）
-#   torchrun - PyTorch 原生分布式训练
+#   torchrun  - PyTorch 原生分布式训练
 
-TRAINING_MODE="single"
+TRAINING_MODE="deepspeed"
 
 
 # ==============================================================================
@@ -87,27 +103,6 @@ TRAINING_MODE="single"
 case $TRAINING_MODE in
 
     # --------------------------------------------------------------------------
-    # 单卡训练
-    # --------------------------------------------------------------------------
-    "single")
-        echo ""
-        echo "启动单卡训练..."
-        echo "GPU: $CUDA_VISIBLE_DEVICES"
-        echo ""
-        
-        python run_training.py \
-            --base_model_path "$BASE_MODEL_PATH" \
-            --ocr_model_path "$OCR_MODEL_PATH" \
-            --train_data "$TRAIN_DATA" \
-            --eval_data "$EVAL_DATA" \
-            --output_dir "$OUTPUT_DIR" \
-            --num_epochs $NUM_EPOCHS \
-            --batch_size $BATCH_SIZE \
-            --gradient_accumulation $GRADIENT_ACCUMULATION \
-            --learning_rate $LEARNING_RATE
-        ;;
-
-    # --------------------------------------------------------------------------
     # DeepSpeed 多卡训练（推荐）
     # --------------------------------------------------------------------------
     "deepspeed")
@@ -115,13 +110,14 @@ case $TRAINING_MODE in
         echo "启动 DeepSpeed 多卡训练..."
         echo "GPU: $CUDA_VISIBLE_DEVICES"
         echo "GPU 数量: $NUM_GPUS"
+        echo "WandB 项目: $WANDB_PROJECT"
         echo ""
         
         # DeepSpeed 启动命令
         # --num_gpus: GPU 数量
         # --master_port: 主节点端口（如有冲突请修改）
         deepspeed --num_gpus=$NUM_GPUS \
-            --master_port=29500 \
+            --master_port=$MASTER_PORT \
             run_training.py \
             --base_model_path "$BASE_MODEL_PATH" \
             --ocr_model_path "$OCR_MODEL_PATH" \
@@ -131,7 +127,9 @@ case $TRAINING_MODE in
             --num_epochs $NUM_EPOCHS \
             --batch_size $BATCH_SIZE \
             --gradient_accumulation $GRADIENT_ACCUMULATION \
-            --learning_rate $LEARNING_RATE
+            --learning_rate $LEARNING_RATE \
+            --wandb_project "$WANDB_PROJECT" \
+            --wandb_run_name "$WANDB_RUN_NAME"
         ;;
 
     # --------------------------------------------------------------------------
@@ -142,13 +140,14 @@ case $TRAINING_MODE in
         echo "启动 torchrun 分布式训练..."
         echo "GPU: $CUDA_VISIBLE_DEVICES"
         echo "GPU 数量: $NUM_GPUS"
+        echo "WandB 项目: $WANDB_PROJECT"
         echo ""
         
         # torchrun 启动命令
         # --nproc_per_node: 每个节点的进程数（GPU 数量）
         # --master_port: 主节点端口
         torchrun --nproc_per_node=$NUM_GPUS \
-            --master_port=29500 \
+            --master_port=$MASTER_PORT \
             run_training.py \
             --base_model_path "$BASE_MODEL_PATH" \
             --ocr_model_path "$OCR_MODEL_PATH" \
@@ -158,12 +157,14 @@ case $TRAINING_MODE in
             --num_epochs $NUM_EPOCHS \
             --batch_size $BATCH_SIZE \
             --gradient_accumulation $GRADIENT_ACCUMULATION \
-            --learning_rate $LEARNING_RATE
+            --learning_rate $LEARNING_RATE \
+            --wandb_project "$WANDB_PROJECT" \
+            --wandb_run_name "$WANDB_RUN_NAME"
         ;;
 
     *)
         echo "错误: 未知的训练模式 '$TRAINING_MODE'"
-        echo "可选值: single, deepspeed, torchrun"
+        echo "可选值: deepspeed, torchrun"
         exit 1
         ;;
 esac

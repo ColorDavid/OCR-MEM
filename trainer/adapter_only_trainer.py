@@ -33,6 +33,12 @@ from typing import Optional, Dict, Any, Union, List
 from dataclasses import dataclass, field
 from functools import partial
 
+try:
+    import wandb
+    WANDB_AVAILABLE = True
+except ImportError:
+    WANDB_AVAILABLE = False
+
 from transformers import (
     Trainer,
     TrainingArguments,
@@ -219,6 +225,26 @@ class AdapterOnlyTrainer(Trainer):
                     f"安全检查失败: 参数 '{name}' 是可训练的，但它不属于 proj 层！\n"
                     f"这可能导致意外的参数更新。请检查模型结构。"
                 )
+    
+    def log(self, logs: Dict[str, float]) -> None:
+        """
+        重写日志方法，添加额外的训练监控指标
+        
+        Args:
+            logs: 日志字典
+        """
+        # 添加额外的监控指标
+        if self.state.global_step > 0:
+            # 添加学习率信息
+            if "learning_rate" not in logs and self.lr_scheduler is not None:
+                logs["learning_rate"] = self.lr_scheduler.get_last_lr()[0]
+            
+            # 添加训练进度
+            if hasattr(self.state, "max_steps") and self.state.max_steps > 0:
+                logs["progress"] = self.state.global_step / self.state.max_steps
+        
+        # 调用父类的 log 方法（会自动发送到 wandb）
+        super().log(logs)
     
     def compute_loss(
         self, 
