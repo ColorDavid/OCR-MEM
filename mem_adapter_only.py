@@ -9,7 +9,6 @@ from transformers import (
 )
 from transformers.modeling_outputs import CausalLMOutputWithPast
 from transformers import PretrainedConfig, PreTrainedModel
-from peft import PeftConfig, LoraConfig
 
 import random
 from typing import Tuple, Optional, List, Union

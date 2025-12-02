@@ -3,6 +3,7 @@ data/
 model/
 checkpoints/
 adapter_checkpoints/
+prepare_env/
 
 # 训练产物
 output/
