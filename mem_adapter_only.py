@@ -26,7 +26,7 @@ class MEMConfig(PretrainedConfig):
         self, 
         base_model_name: str = "",
         ocr_model_name: str = "",
-        vision_embedding_size: int = 512,
+        vision_embedding_size: int = 1024,
         context_threshold: int = 2048,
         **kwargs
     ):
@@ -341,14 +341,21 @@ class MEMModel(PreTrainedModel):
             vision_features_list = []
             with torch.no_grad():
                 for img in images:
-                    # OCR编码: [num_tokens, vision_embedding_size]
+                    # OCR编码: [1, N, 1024] where N=256 for 1024x1024 input
                     img_features = self.ocr_embed(img)
-                    # 确保维度正确：如果是1D则添加batch维度
-                    if img_features.dim() == 1:
+                    # 处理不同维度情况，最终得到 [N, 1024] 形状
+                    if img_features.dim() == 3:
+                        # [1, N, 1024] -> [N, 1024] (去除batch维度)
+                        img_features = img_features.squeeze(0)
+                    elif img_features.dim() == 2:
+                        # 已经是 [N, 1024]，无需处理
+                        pass
+                    elif img_features.dim() == 1:
+                        # [1024] -> [1, 1024] (单token情况)
                         img_features = img_features.unsqueeze(0)
                     vision_features_list.append(img_features)
             
-            # 拼接所有图像的特征: [total_tokens, vision_embedding_size]
+            # 拼接所有图像的特征: [total_tokens, 1024]
             vision_features = torch.cat(vision_features_list, dim=0)
             
             # 4. 投影到语言模型的隐藏空间: [total_tokens, hidden_size]
