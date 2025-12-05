@@ -52,6 +52,8 @@ export WANDB_RUN_NAME="mem_adapter_training"
 # WandB 模式：online（实时同步）、offline（离线保存）、disabled（禁用）
 export WANDB_MODE="online"
 
+export DISABLE_TENSORBOARD=1
+
 # -------------------- 模型路径（本地路径）--------------------
 # 基础语言模型路径
 export BASE_MODEL_PATH="/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B"

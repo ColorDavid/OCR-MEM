@@ -20,7 +20,7 @@ from deepseek_ocr_encoder import DeepSeekOCREncoder
 
 
 class MEMConfig(PretrainedConfig):
-    model_type = "mem_model"
+    # model_type = "mem_model"
     
     def __init__(
         self, 
@@ -31,7 +31,7 @@ class MEMConfig(PretrainedConfig):
         **kwargs
     ):
         super().__init__(**kwargs)
-        self.base_model_name = base_model_name
+        self.base_llm_model_name = base_model_name
         self.ocr_model_name = ocr_model_name
         self.vision_embedding_size = vision_embedding_size
         self.context_threshold = context_threshold
@@ -60,13 +60,13 @@ class MEMModel(PreTrainedModel):
         super().__init__(config)
         
         # 基础语言模型
-        self.base_model = AutoModelForCausalLM.from_pretrained(
-            config.base_model_name, 
+        self.base_llm_model = AutoModelForCausalLM.from_pretrained(
+            config.base_llm_model_name, 
             torch_dtype=torch.bfloat16, 
             attn_implementation="flash_attention_2"
         )
-        self.tokenizer = AutoTokenizer.from_pretrained(config.base_model_name)
-        self.base_model_config = self.base_model.config
+        self.tokenizer = AutoTokenizer.from_pretrained(config.base_llm_model_name)
+        self.base_llm_model_config = self.base_llm_model.config
         
         # 全局配置参数
         self.context_threshold = config.context_threshold
@@ -78,18 +78,18 @@ class MEMModel(PreTrainedModel):
         self.ocr_embed = DeepSeekOCREncoder.from_pretrained(config.ocr_model_name)
         
         # 冻结base_model和ocr_embed
-        for param in self.base_model.parameters():
+        for param in self.base_llm_model.parameters():
             param.requires_grad = False
         for param in self.ocr_embed.parameters():
             param.requires_grad = False
         
         # 投影层：将视觉特征投影到语言模型的隐藏空间
         # 使用与base_model相同的dtype确保一致性
-        mlp_hidden_dim = max(config.vision_embedding_size, self.base_model_config.hidden_size)
+        mlp_hidden_dim = max(config.vision_embedding_size, self.base_llm_model_config.hidden_size)
         self.proj = nn.Sequential(
             nn.Linear(config.vision_embedding_size, mlp_hidden_dim, dtype=torch.bfloat16),
             nn.GELU(),
-            nn.Linear(mlp_hidden_dim, self.base_model_config.hidden_size, dtype=torch.bfloat16)
+            nn.Linear(mlp_hidden_dim, self.base_llm_model_config.hidden_size, dtype=torch.bfloat16)
         )
         
         # 初始化投影层权重
@@ -105,32 +105,32 @@ class MEMModel(PreTrainedModel):
 
     def get_input_embeddings(self):
         """返回输入嵌入层"""
-        return self.base_model.get_input_embeddings()
+        return self.base_llm_model.get_input_embeddings()
 
     def set_input_embeddings(self, value):
         """设置输入嵌入层"""
-        self.base_model.set_input_embeddings(value)
+        self.base_llm_model.set_input_embeddings(value)
 
     def get_output_embeddings(self):
         """返回输出嵌入层（用于语言模型头）"""
-        return self.base_model.get_output_embeddings()
+        return self.base_llm_model.get_output_embeddings()
 
     def set_output_embeddings(self, new_embeddings):
         """设置输出嵌入层"""
-        self.base_model.set_output_embeddings(new_embeddings)
+        self.base_llm_model.set_output_embeddings(new_embeddings)
 
     def gradient_checkpointing_enable(self, gradient_checkpointing_kwargs=None):
         """启用梯度检查点以节省内存"""
-        self.base_model.gradient_checkpointing_enable(gradient_checkpointing_kwargs)
+        self.base_llm_model.gradient_checkpointing_enable(gradient_checkpointing_kwargs)
 
     def gradient_checkpointing_disable(self):
         """禁用梯度检查点"""
-        self.base_model.gradient_checkpointing_disable()
+        self.base_llm_model.gradient_checkpointing_disable()
 
     @property
     def is_gradient_checkpointing(self) -> bool:
         """检查是否启用了梯度检查点"""
-        return getattr(self.base_model, "is_gradient_checkpointing", False)
+        return getattr(self.base_llm_model, "is_gradient_checkpointing", False)
 
     def train(self, mode: bool = True):
         """
@@ -138,7 +138,7 @@ class MEMModel(PreTrainedModel):
         """
         super().train(mode)
         # 保持base_model和ocr_embed为eval模式
-        self.base_model.eval()
+        self.base_llm_model.eval()
         self.ocr_embed.eval()
         # 只有proj层参与训练
         if mode:
@@ -240,7 +240,7 @@ class MEMModel(PreTrainedModel):
         # 保存配置（包含model_type）
         config_dict = {
             "model_type": self.config.model_type,
-            "base_model_name": self.config.base_model_name,
+            "base_llm_model_name": self.config.base_llm_model_name,
             "ocr_model_name": self.config.ocr_model_name,
             "vision_embedding_size": self.config.vision_embedding_size,
             "context_threshold": self.config.context_threshold,
@@ -282,10 +282,10 @@ class MEMModel(PreTrainedModel):
         """
         batch_size, seq_len = input_ids.shape
         device = input_ids.device
-        hidden_size = self.base_model_config.hidden_size
+        hidden_size = self.base_llm_model_config.hidden_size
         
         # 获取原始输入嵌入
-        inputs_embeds = self.base_model.get_input_embeddings()(input_ids)
+        inputs_embeds = self.base_llm_model.get_input_embeddings()(input_ids)
         
         # 识别assistant消息位置 (使用"<|im_start|>assistant\n"模式)
         assistant_pattern_ids = self.tokenizer.encode("<|im_start|>assistant\n", add_special_tokens=False)
@@ -339,14 +339,14 @@ class MEMModel(PreTrainedModel):
             
             # 3. 通过OCR编码器提取每张图像的视觉特征并拼接
             vision_features_list = []
-            with torch.no_grad():
-                for img in images:
-                    # OCR编码: [num_tokens, vision_embedding_size]
-                    img_features = self.ocr_embed(img)
-                    # 确保维度正确：如果是1D则添加batch维度
-                    if img_features.dim() == 1:
-                        img_features = img_features.unsqueeze(0)
-                    vision_features_list.append(img_features)
+            # with torch.no_grad():
+            for img in images:
+                # OCR编码: [num_tokens, vision_embedding_size]
+                img_features = self.ocr_embed(img)
+                # 确保维度正确：如果是1D则添加batch维度
+                if img_features.dim() == 1:
+                    img_features = img_features.unsqueeze(0)
+                vision_features_list.append(img_features)
             
             # 拼接所有图像的特征: [total_tokens, vision_embedding_size]
             vision_features = torch.cat(vision_features_list, dim=0)
@@ -437,7 +437,7 @@ class MEMModel(PreTrainedModel):
                 )
         
         # 调用base_model进行前向传播
-        outputs = self.base_model(
+        outputs = self.base_llm_model(
             inputs_embeds=final_embeds,
             attention_mask=final_masks,
             position_ids=position_ids,

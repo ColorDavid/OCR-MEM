@@ -56,6 +56,7 @@ MEMModel Adapter 训练脚本
 
 import os
 import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import json
 import argparse
 from pathlib import Path
@@ -223,117 +224,159 @@ def create_deepspeed_config(
     
     # 计算全局 batch size
     train_batch_size = per_device_batch_size * gradient_accumulation_steps * world_size
-    
-    # DeepSpeed 配置
+
+    # 原始ds_config设置    
+    # # DeepSpeed 配置
+    # ds_config = {
+    #     # ============================================================
+    #     # 批次配置
+    #     # ============================================================
+    #     # 全局 batch size = per_device * accumulation * world_size
+    #     "train_batch_size": train_batch_size,
+        
+    #     # 每个 GPU 每次前向传播的 batch size
+    #     "train_micro_batch_size_per_gpu": per_device_batch_size,
+        
+    #     # 梯度累积步数
+    #     "gradient_accumulation_steps": gradient_accumulation_steps,
+        
+    #     # ============================================================
+    #     # 精度配置
+    #     # ============================================================
+    #     # 使用 BFloat16 混合精度（比 FP16 更稳定，A100/H100 推荐）
+    #     "bf16": {
+    #         "enabled": True
+    #     },
+        
+    #     # 禁用 FP16（与 BF16 互斥）
+    #     "fp16": {
+    #         "enabled": False
+    #     },
+        
+    #     # ============================================================
+    #     # ZeRO 优化配置
+    #     # ============================================================
+    #     "zero_optimization": {
+    #         # ZeRO Stage 2: 优化器状态 + 梯度分片
+    #         # 显存节省约 50-60%，通信开销适中
+    #         "stage": 2,
+            
+    #         # 将优化器状态 offload 到 CPU
+    #         # Adam 优化器的 momentum 和 variance 会占用大量显存
+    #         # Offload 后可节省约 2x 模型大小的显存
+    #         "offload_optimizer": {
+    #             "device": "cpu",           # 目标设备
+    #             "pin_memory": True,        # 使用锁页内存加速传输
+    #             "buffer_count": 4,         # 缓冲区数量
+    #             "fast_init": False         # 快速初始化（可能不稳定）
+    #         },
+            
+    #         # 是否 offload 参数到 CPU（Stage 3 时生效）
+    #         # Stage 2 时此选项无效
+    #         # "offload_param": {
+    #         #     "device": "cpu",
+    #         #     "pin_memory": True
+    #         # },
+            
+    #         # AllGather 优化
+    #         "allgather_partitions": True,
+    #         "allgather_bucket_size": 5e8,
+            
+    #         # Reduce-Scatter 优化
+    #         "reduce_scatter": True,
+    #         "reduce_bucket_size": 5e8,
+            
+    #         # 通信与计算重叠
+    #         "overlap_comm": True,
+            
+    #         # 使用连续梯度存储（减少内存碎片）
+    #         "contiguous_gradients": True,
+            
+    #         # 子组大小（影响通信效率）
+    #         # "sub_group_size": 1e9,
+            
+    #         # 是否在第一步后减少 bucket 大小
+    #         "reduce_bucket_size": 1280*1280*2,#"auto",
+            
+    #         # 阶段 3 相关选项（此处不使用）
+    #         # "stage3_prefetch_bucket_size": "auto",
+    #         # "stage3_param_persistence_threshold": "auto",
+    #         # "stage3_max_live_parameters": 1e9,
+    #         # "stage3_max_reuse_distance": 1e9,
+    #         # "stage3_gather_16bit_weights_on_model_save": True,
+    #     },
+        
+    #     # ============================================================
+    #     # 梯度配置
+    #     # ============================================================
+    #     # 梯度裁剪
+    #     "gradient_clipping": max_grad_norm,
+        
+    #     # ============================================================
+    #     # 激活检查点（节省显存，但增加计算时间）
+    #     # ============================================================
+    #     # 注意：这里不启用，因为我们只训练 adapter
+    #     # 如果需要，可以在模型中手动启用 gradient_checkpointing
+    #     # "activation_checkpointing": {
+    #     #     "partition_activations": True,
+    #     #     "cpu_checkpointing": True,
+    #     #     "contiguous_memory_optimization": True,
+    #     #     "number_checkpoints": None,
+    #     #     "synchronize_checkpoint_boundary": False,
+    #     #     "profile": False
+    #     # },
+        
+    #     # ============================================================
+    #     # 日志与调试
+    #     # ============================================================
+    #     "steps_per_print": logging_steps,
+    #     "wall_clock_breakdown": False,
+        
+    #     # 禁用不需要的功能
+    #     "dump_state": False,
+    # }
     ds_config = {
-        # ============================================================
-        # 批次配置
-        # ============================================================
-        # 全局 batch size = per_device * accumulation * world_size
-        "train_batch_size": train_batch_size,
-        
-        # 每个 GPU 每次前向传播的 batch size
-        "train_micro_batch_size_per_gpu": per_device_batch_size,
-        
-        # 梯度累积步数
-        "gradient_accumulation_steps": gradient_accumulation_steps,
-        
-        # ============================================================
-        # 精度配置
-        # ============================================================
-        # 使用 BFloat16 混合精度（比 FP16 更稳定，A100/H100 推荐）
-        "bf16": {
-            "enabled": True
+        "train_batch_size": 128,
+        "train_micro_batch_size_per_gpu": 2,
+        "gradient_accumulation_steps": 8,
+
+        "optimizer": {
+            "type": "AdamW",
+            "params": {
+                "lr": 2e-4,
+                "betas": [0.9, 0.999],
+                "eps": 1e-8,
+                "weight_decay": 0.01
+            }
         },
-        
-        # 禁用 FP16（与 BF16 互斥）
-        "fp16": {
-            "enabled": False
+
+        "scheduler": {
+            "type": "WarmupLR",
+            "params": {
+                "warmup_min_lr": 0,
+                "warmup_max_lr": 2e-4,
+                "warmup_num_steps": "auto"  # 关键修改
+            }
         },
-        
-        # ============================================================
-        # ZeRO 优化配置
-        # ============================================================
+
         "zero_optimization": {
-            # ZeRO Stage 2: 优化器状态 + 梯度分片
-            # 显存节省约 50-60%，通信开销适中
             "stage": 2,
-            
-            # 将优化器状态 offload 到 CPU
-            # Adam 优化器的 momentum 和 variance 会占用大量显存
-            # Offload 后可节省约 2x 模型大小的显存
-            "offload_optimizer": {
-                "device": "cpu",           # 目标设备
-                "pin_memory": True,        # 使用锁页内存加速传输
-                "buffer_count": 4,         # 缓冲区数量
-                "fast_init": False         # 快速初始化（可能不稳定）
-            },
-            
-            # 是否 offload 参数到 CPU（Stage 3 时生效）
-            # Stage 2 时此选项无效
-            # "offload_param": {
-            #     "device": "cpu",
-            #     "pin_memory": True
-            # },
-            
-            # AllGather 优化
+            "contiguous_gradients": True,
+            "overlap_comm": True,
+            "reduce_scatter": True,
             "allgather_partitions": True,
             "allgather_bucket_size": 5e8,
-            
-            # Reduce-Scatter 优化
-            "reduce_scatter": True,
             "reduce_bucket_size": 5e8,
-            
-            # 通信与计算重叠
-            "overlap_comm": True,
-            
-            # 使用连续梯度存储（减少内存碎片）
-            "contiguous_gradients": True,
-            
-            # 子组大小（影响通信效率）
-            # "sub_group_size": 1e9,
-            
-            # 是否在第一步后减少 bucket 大小
-            "reduce_bucket_size": "auto",
-            
-            # 阶段 3 相关选项（此处不使用）
-            # "stage3_prefetch_bucket_size": "auto",
-            # "stage3_param_persistence_threshold": "auto",
-            # "stage3_max_live_parameters": 1e9,
-            # "stage3_max_reuse_distance": 1e9,
-            # "stage3_gather_16bit_weights_on_model_save": True,
         },
-        
-        # ============================================================
-        # 梯度配置
-        # ============================================================
-        # 梯度裁剪
-        "gradient_clipping": max_grad_norm,
-        
-        # ============================================================
-        # 激活检查点（节省显存，但增加计算时间）
-        # ============================================================
-        # 注意：这里不启用，因为我们只训练 adapter
-        # 如果需要，可以在模型中手动启用 gradient_checkpointing
-        # "activation_checkpointing": {
-        #     "partition_activations": True,
-        #     "cpu_checkpointing": True,
-        #     "contiguous_memory_optimization": True,
-        #     "number_checkpoints": None,
-        #     "synchronize_checkpoint_boundary": False,
-        #     "profile": False
-        # },
-        
-        # ============================================================
-        # 日志与调试
-        # ============================================================
-        "steps_per_print": logging_steps,
+
+        "fp16": {"enabled": False},
+        "bf16": {"enabled": True},
+
+        "gradient_clipping": 1.0,
+        "steps_per_print": 10,
         "wall_clock_breakdown": False,
-        
-        # 禁用不需要的功能
-        "dump_state": False,
     }
-    
+
     # 保存配置文件
     config_path = os.path.join(output_dir, "ds_config_auto.json")
     os.makedirs(output_dir, exist_ok=True)
