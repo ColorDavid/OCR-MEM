@@ -134,15 +134,30 @@ class MEMModel(PreTrainedModel):
 
     def train(self, mode: bool = True):
         """
-        设置训练模式，确保冻结的模块保持eval状态
+        设置训练模式
+        
+        重要说明：
+        虽然base_model和ocr_embed的参数被冻结(requires_grad=False)，
+        但它们仍需要保持在train模式以正确传播梯度到可训练的proj层。
+        将冻结模型设为eval()会完全断开梯度计算图。
+        
+        正确做法：
+        1. 参数冻结通过requires_grad=False实现
+        2. 所有模块保持train模式以维持计算图
+        3. 如需特殊行为(如禁用dropout)，在forward中单独处理
         """
         super().train(mode)
-        # 保持base_model和ocr_embed为eval模式
-        self.base_llm_model.eval()
-        self.ocr_embed.eval()
-        # 只有proj层参与训练
+        # 关键修复：不要将base_model设为eval模式！
+        # 冻结参数(requires_grad=False)已经足够防止参数更新
+        # 设为eval()会断开整个计算图的梯度传播
         if mode:
+            self.base_llm_model.train()  # 保持train模式以传播梯度
+            self.ocr_embed.train()       # 保持train模式以传播梯度
             self.proj.train()
+        else:
+            self.base_llm_model.eval()
+            self.ocr_embed.eval()
+            self.proj.eval()
         return self
 
     def get_trainable_parameters(self) -> List[nn.Parameter]:
@@ -150,14 +165,31 @@ class MEMModel(PreTrainedModel):
         return [p for p in self.proj.parameters() if p.requires_grad]
 
     def print_trainable_parameters(self):
-        """打印可训练参数统计"""
+        """打印可训练参数统计和详细信息"""
         trainable_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
         all_params = sum(p.numel() for p in self.parameters())
+        
         print(
             f"trainable params: {trainable_params:,} || "
             f"all params: {all_params:,} || "
             f"trainable%: {100 * trainable_params / all_params:.4f}%"
         )
+        
+        # 验证冻结状态
+        base_trainable = sum(p.numel() for p in self.base_llm_model.parameters() if p.requires_grad)
+        ocr_trainable = sum(p.numel() for p in self.ocr_embed.parameters() if p.requires_grad)
+        proj_trainable = sum(p.numel() for p in self.proj.parameters() if p.requires_grad)
+        
+        print(f"\nDetailed breakdown:")
+        print(f"  base_llm_model trainable params: {base_trainable:,} (should be 0)")
+        print(f"  ocr_embed trainable params: {ocr_trainable:,} (should be 0)")
+        print(f"  proj trainable params: {proj_trainable:,}")
+        
+        # 警告：如果冻结的模块有可训练参数
+        if base_trainable > 0:
+            print(f"  ⚠️ WARNING: base_llm_model should be frozen but has {base_trainable:,} trainable params!")
+        if ocr_trainable > 0:
+            print(f"  ⚠️ WARNING: ocr_embed should be frozen but has {ocr_trainable:,} trainable params!")
 
     @classmethod
     def from_pretrained(
@@ -279,12 +311,23 @@ class MEMModel(PreTrainedModel):
         2. 如果之前的历史超过context_threshold，将其压缩为视觉嵌入
         3. 保留最后一个assistant及之后的内容
         4. 正确处理维度变化
+        
+        梯度流说明：
+        - input_ids -> embedding层(冻结) -> inputs_embeds [有grad_fn]
+        - 历史文本 -> OCR编码器(冻结) -> vision_features [有grad_fn] 
+        - vision_features -> proj层(可训练) -> vision_embeds [有grad_fn]
+        - 拼接后 -> base_llm(冻结) -> logits [有grad_fn] -> loss [有grad_fn]
+        
+        关键点：
+        - 虽然base_llm和ocr_embed参数冻结，但forward必须在计算图中
+        - 只有proj层的参数会更新，但梯度需要流经整个网络
+        - 不能使用torch.no_grad()、detach()或eval()模式
         """
         batch_size, seq_len = input_ids.shape
         device = input_ids.device
         hidden_size = self.base_llm_model_config.hidden_size
         
-        # 获取原始输入嵌入
+        # 获取原始输入嵌入 - 此操作在计算图中，即使embedding层冻结
         inputs_embeds = self.base_llm_model.get_input_embeddings()(input_ids)
         
         # 识别assistant消息位置 (使用"<|im_start|>assistant\n"模式)
@@ -400,7 +443,13 @@ class MEMModel(PreTrainedModel):
             
             # 左padding embeddings
             if pad_len > 0:
-                pad_embeds = torch.zeros(pad_len, hidden_size, device=device, dtype=inputs_embeds.dtype)
+                # 使用zeros_like确保dtype和device匹配，保持梯度计算图
+                pad_embeds = torch.zeros(
+                    pad_len, hidden_size, 
+                    device=device, 
+                    dtype=inputs_embeds.dtype,
+                    requires_grad=False  # padding不需要梯度
+                )
                 padded_emb = torch.cat([pad_embeds, final_embeds_list[i]], dim=0)
             else:
                 padded_emb = final_embeds_list[i]
