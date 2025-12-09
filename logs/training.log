@@ -13,28 +13,58 @@ GPU:
 GPU 数量: 8
 WandB 项目: OCR-MEM
 
-[2025-12-05 15:19:19,695] [WARNING] [runner.py:232:fetch_hostfile] Unable to find hostfile, will proceed with training with local resources only.
-[2025-12-05 15:19:19,695] [INFO] [runner.py:630:main] cmd = /mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12 -u -m deepspeed.launcher.launch --world_info=eyJsb2NhbGhvc3QiOiBbMCwgMSwgMiwgMywgNCwgNSwgNiwgN119 --master_addr=127.0.0.1 --master_port=29500 --enable_each_rank_log=None --log_level=info run_training.py --base_model_path /mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B --ocr_model_path /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR --train_data /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl --eval_data /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl --output_dir ./adapter_checkpoints --num_epochs 2 --batch_size 2 --gradient_accumulation 8 --learning_rate 2e-4 --wandb_project OCR-MEM --wandb_run_name mem_adapter_training
-[2025-12-05 15:19:25,758] [INFO] [launch.py:155:main] 0 NV_LIBNCCL_DEV_PACKAGE=libnccl-dev=2.18.3-1+cuda12.1
-[2025-12-05 15:19:25,758] [INFO] [launch.py:155:main] 0 NV_LIBNCCL_DEV_PACKAGE_VERSION=2.18.3-1
-[2025-12-05 15:19:25,758] [INFO] [launch.py:155:main] 0 NCCL_VERSION=2.18.3-1
-[2025-12-05 15:19:25,758] [INFO] [launch.py:155:main] 0 NV_LIBNCCL_DEV_PACKAGE_NAME=libnccl-dev
-[2025-12-05 15:19:25,758] [INFO] [launch.py:155:main] 0 NV_LIBNCCL_PACKAGE=libnccl2=2.18.3-1+cuda12.1
-[2025-12-05 15:19:25,758] [INFO] [launch.py:155:main] 0 NV_LIBNCCL_PACKAGE_NAME=libnccl2
-[2025-12-05 15:19:25,758] [INFO] [launch.py:155:main] 0 NV_LIBNCCL_PACKAGE_VERSION=2.18.3-1
-[2025-12-05 15:19:25,758] [INFO] [launch.py:162:main] WORLD INFO DICT: {'localhost': [0, 1, 2, 3, 4, 5, 6, 7]}
-[2025-12-05 15:19:25,758] [INFO] [launch.py:168:main] nnodes=1, num_local_procs=8, node_rank=0
-[2025-12-05 15:19:25,758] [INFO] [launch.py:179:main] global_rank_mapping=defaultdict(<class 'list'>, {'localhost': [0, 1, 2, 3, 4, 5, 6, 7]})
-[2025-12-05 15:19:25,758] [INFO] [launch.py:180:main] dist_world_size=8
-[2025-12-05 15:19:25,758] [INFO] [launch.py:184:main] Setting CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
-[2025-12-05 15:19:25,759] [INFO] [launch.py:272:main] process 1545838 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=0', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
-[2025-12-05 15:19:25,760] [INFO] [launch.py:272:main] process 1545839 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=1', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
-[2025-12-05 15:19:25,760] [INFO] [launch.py:272:main] process 1545840 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=2', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
-[2025-12-05 15:19:25,761] [INFO] [launch.py:272:main] process 1545841 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=3', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
-[2025-12-05 15:19:25,761] [INFO] [launch.py:272:main] process 1545842 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=4', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
-[2025-12-05 15:19:25,762] [INFO] [launch.py:272:main] process 1545843 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=5', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
-[2025-12-05 15:19:25,762] [INFO] [launch.py:272:main] process 1545844 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=6', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
-[2025-12-05 15:19:25,763] [INFO] [launch.py:272:main] process 1545845 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=7', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
+[2025-12-09 15:46:06,356] [WARNING] [runner.py:232:fetch_hostfile] Unable to find hostfile, will proceed with training with local resources only.
+[2025-12-09 15:46:06,357] [INFO] [runner.py:630:main] cmd = /mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12 -u -m deepspeed.launcher.launch --world_info=eyJsb2NhbGhvc3QiOiBbMCwgMSwgMiwgMywgNCwgNSwgNiwgN119 --master_addr=127.0.0.1 --master_port=29500 --enable_each_rank_log=None --log_level=info run_training.py --base_model_path /mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B --ocr_model_path /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR --train_data /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl --eval_data /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl --output_dir ./adapter_checkpoints --num_epochs 2 --batch_size 2 --gradient_accumulation 8 --learning_rate 2e-4 --wandb_project OCR-MEM --wandb_run_name mem_adapter_training
+[2025-12-09 15:46:16,346] [INFO] [launch.py:155:main] 0 NV_LIBNCCL_DEV_PACKAGE=libnccl-dev=2.18.3-1+cuda12.1
+[2025-12-09 15:46:16,346] [INFO] [launch.py:155:main] 0 NV_LIBNCCL_DEV_PACKAGE_VERSION=2.18.3-1
+[2025-12-09 15:46:16,346] [INFO] [launch.py:155:main] 0 NCCL_VERSION=2.18.3-1
+[2025-12-09 15:46:16,346] [INFO] [launch.py:155:main] 0 NV_LIBNCCL_DEV_PACKAGE_NAME=libnccl-dev
+[2025-12-09 15:46:16,346] [INFO] [launch.py:155:main] 0 NV_LIBNCCL_PACKAGE=libnccl2=2.18.3-1+cuda12.1
+[2025-12-09 15:46:16,346] [INFO] [launch.py:155:main] 0 NV_LIBNCCL_PACKAGE_NAME=libnccl2
+[2025-12-09 15:46:16,346] [INFO] [launch.py:155:main] 0 NV_LIBNCCL_PACKAGE_VERSION=2.18.3-1
+[2025-12-09 15:46:16,346] [INFO] [launch.py:162:main] WORLD INFO DICT: {'localhost': [0, 1, 2, 3, 4, 5, 6, 7]}
+[2025-12-09 15:46:16,346] [INFO] [launch.py:168:main] nnodes=1, num_local_procs=8, node_rank=0
+[2025-12-09 15:46:16,347] [INFO] [launch.py:179:main] global_rank_mapping=defaultdict(<class 'list'>, {'localhost': [0, 1, 2, 3, 4, 5, 6, 7]})
+[2025-12-09 15:46:16,347] [INFO] [launch.py:180:main] dist_world_size=8
+[2025-12-09 15:46:16,347] [INFO] [launch.py:184:main] Setting CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+[2025-12-09 15:46:16,347] [INFO] [launch.py:272:main] process 1753061 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=0', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
+[2025-12-09 15:46:16,348] [INFO] [launch.py:272:main] process 1753062 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=1', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
+[2025-12-09 15:46:16,348] [INFO] [launch.py:272:main] process 1753063 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=2', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
+[2025-12-09 15:46:16,349] [INFO] [launch.py:272:main] process 1753064 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=3', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
+[2025-12-09 15:46:16,349] [INFO] [launch.py:272:main] process 1753065 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=4', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
+[2025-12-09 15:46:16,350] [INFO] [launch.py:272:main] process 1753066 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=5', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
+[2025-12-09 15:46:16,350] [INFO] [launch.py:272:main] process 1753067 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=6', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
+[2025-12-09 15:46:16,351] [INFO] [launch.py:272:main] process 1753068 spawned with command: ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=7', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training']
+
+======================================================================
+WARNING: Incompatible transformers version detected!
+======================================================================
+Current version: 4.57.3
+Required version: >=4.30.0,<4.48.0
+
+The DeepSeek-OCR model requires specific transformers features that
+may not be available in version 4.57.3.
+
+To fix this issue, please run:
+  pip install 'transformers>=4.30.0,<4.48.0'
+
+Recommended version: transformers==4.47.0
+======================================================================
+
+======================================================================
+WARNING: Incompatible transformers version detected!
+======================================================================
+Current version: 4.57.3
+Required version: >=4.30.0,<4.48.0
+
+The DeepSeek-OCR model requires specific transformers features that
+may not be available in version 4.57.3.
+
+To fix this issue, please run:
+  pip install 'transformers>=4.30.0,<4.48.0'
+
+Recommended version: transformers==4.47.0
+======================================================================
 
 ======================================================================
 WARNING: Incompatible transformers version detected!
@@ -52,86 +82,6 @@ Recommended version: transformers==4.47.0
 ======================================================================
 
 
-============================================================
-验证配置和路径
-============================================================
-
-✓ 基础模型路径: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B
-✓ OCR 模型路径: /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR
-✓ 训练数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 验证数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 输出目录: ./adapter_checkpoints
-
-============================================================
-配置 DeepSpeed
-============================================================
-
-============================================================
-DeepSpeed 配置已生成
-============================================================
-配置文件: ./adapter_checkpoints/ds_config_auto.json
-ZeRO Stage: 2
-CPU Offloading: 优化器状态
-精度: BFloat16
-全局 Batch Size: 128
-每 GPU Batch Size: 2
-梯度累积: 8
-World Size: 8
-============================================================
-
-
-============================================================
-创建训练参数
-============================================================
-
-
-======================================================================
-WARNING: Incompatible transformers version detected!
-======================================================================
-Current version: 4.57.3
-Required version: >=4.30.0,<4.48.0
-
-The DeepSeek-OCR model requires specific transformers features that
-may not be available in version 4.57.3.
-
-To fix this issue, please run:
-  pip install 'transformers>=4.30.0,<4.48.0'
-
-Recommended version: transformers==4.47.0
-======================================================================
-
-
-============================================================
-验证配置和路径
-============================================================
-
-✓ 基础模型路径: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B
-✓ OCR 模型路径: /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR
-✓ 训练数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 验证数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 输出目录: ./adapter_checkpoints
-
-============================================================
-配置 DeepSpeed
-============================================================
-
-============================================================
-DeepSpeed 配置已生成
-============================================================
-配置文件: ./adapter_checkpoints/ds_config_auto.json
-ZeRO Stage: 2
-CPU Offloading: 优化器状态
-精度: BFloat16
-全局 Batch Size: 128
-每 GPU Batch Size: 2
-梯度累积: 8
-World Size: 8
-============================================================
-
-
-============================================================
-创建训练参数
-============================================================
 
 
 ======================================================================
@@ -213,36 +163,6 @@ To fix this issue, please run:
 Recommended version: transformers==4.47.0
 ======================================================================
 
-
-======================================================================
-WARNING: Incompatible transformers version detected!
-======================================================================
-Current version: 4.57.3
-Required version: >=4.30.0,<4.48.0
-
-The DeepSeek-OCR model requires specific transformers features that
-may not be available in version 4.57.3.
-
-To fix this issue, please run:
-  pip install 'transformers>=4.30.0,<4.48.0'
-
-Recommended version: transformers==4.47.0
-======================================================================
-
-
-============================================================
-验证配置和路径
-============================================================
-
-✓ 基础模型路径: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B
-✓ OCR 模型路径: /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR
-✓ 训练数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 验证数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 输出目录: ./adapter_checkpoints
-
-============================================================
-配置 DeepSpeed
-============================================================
 
 ============================================================
 ============================================================
@@ -250,8 +170,8 @@ Recommended version: transformers==4.47.0
 验证配置和路径验证配置和路径
 
 ============================================================
-
 ============================================================
+
 
 ✓ 基础模型路径: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B✓ 基础模型路径: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B
 
@@ -261,53 +181,67 @@ Recommended version: transformers==4.47.0
 
 ✓ 验证数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl✓ 验证数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
 
-✓ 输出目录: ./adapter_checkpoints✓ 输出目录: ./adapter_checkpoints
+
+============================================================✓ 输出目录: ./adapter_checkpoints✓ 输出目录: ./adapter_checkpoints
 
 
 ============================================================
 ============================================================
+
 
 配置 DeepSpeed配置 DeepSpeed
-
-========================================================================================================================
-
-
+验证配置和路径
+============================================================
 ============================================================
 ============================================================
 
+
+✓ 基础模型路径: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B
+✓ OCR 模型路径: /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR
+✓ 训练数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 验证数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 输出目录: ./adapter_checkpoints
+
 ============================================================
+配置 DeepSpeed
+============================================================
+
+============================================================
+============================================================
+============================================================
+
 DeepSpeed 配置已生成DeepSpeed 配置已生成
 
 
-============================================================DeepSpeed 配置已生成============================================================
+DeepSpeed 配置已生成========================================================================================================================
 
 
-配置文件: ./adapter_checkpoints/ds_config_auto.json============================================================配置文件: ./adapter_checkpoints/ds_config_auto.json
+============================================================配置文件: ./adapter_checkpoints/ds_config_auto.json配置文件: ./adapter_checkpoints/ds_config_auto.json
 
 
-ZeRO Stage: 2配置文件: ./adapter_checkpoints/ds_config_auto.jsonZeRO Stage: 2
+配置文件: ./adapter_checkpoints/ds_config_auto.jsonZeRO Stage: 2ZeRO Stage: 2
 
 
-CPU Offloading: 优化器状态ZeRO Stage: 2CPU Offloading: 优化器状态
+ZeRO Stage: 2CPU Offloading: 优化器状态CPU Offloading: 优化器状态
 
 
-精度: BFloat16CPU Offloading: 优化器状态精度: BFloat16
+CPU Offloading: 优化器状态精度: BFloat16精度: BFloat16
 
 
-全局 Batch Size: 128精度: BFloat16全局 Batch Size: 128
+精度: BFloat16全局 Batch Size: 128全局 Batch Size: 128
 
 
-每 GPU Batch Size: 2全局 Batch Size: 128每 GPU Batch Size: 2
+全局 Batch Size: 128每 GPU Batch Size: 2每 GPU Batch Size: 2
 
 
-梯度累积: 8每 GPU Batch Size: 2梯度累积: 8
+每 GPU Batch Size: 2梯度累积: 8梯度累积: 8
 
 
-World Size: 8梯度累积: 8World Size: 8
+梯度累积: 8World Size: 8World Size: 8
 
 
-============================================================
 World Size: 8============================================================
+============================================================
 
 
 
@@ -317,48 +251,15 @@ World Size: 8============================================================
 
 ============================================================
 
-创建训练参数
-============================================================
-创建训练参数
-============================================================
 
-创建训练参数
-============================================================
+============================================================创建训练参数创建训练参数
 
 
+创建训练参数============================================================
 ============================================================
 
 
-============================================================
-验证配置和路径
-============================================================
 
-✓ 基础模型路径: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B
-✓ OCR 模型路径: /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR
-✓ 训练数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 验证数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 输出目录: ./adapter_checkpoints
-
-============================================================
-配置 DeepSpeed
-============================================================
-
-============================================================
-DeepSpeed 配置已生成
-============================================================
-配置文件: ./adapter_checkpoints/ds_config_auto.json
-ZeRO Stage: 2
-CPU Offloading: 优化器状态
-精度: BFloat16
-全局 Batch Size: 128
-每 GPU Batch Size: 2
-梯度累积: 8
-World Size: 8
-============================================================
-
-
-============================================================
-创建训练参数
 ============================================================
 
 
@@ -428,16 +329,104 @@ World Size: 8
 ============================================================
 
 
-✓ 训练轮数: 2
-✓ 每 GPU Batch Size: 2
-✓ 梯度累积: 8
-✓ 学习率: 0.0002
-
 ============================================================
-初始化模型
+验证配置和路径
 ============================================================
 
-正在加载模型，这可能需要几分钟...
+✓ 基础模型路径: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B
+✓ OCR 模型路径: /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR
+✓ 训练数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 验证数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 输出目录: ./adapter_checkpoints
+
+============================================================
+配置 DeepSpeed
+============================================================
+
+============================================================
+验证配置和路径
+============================================================
+
+✓ 基础模型路径: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B
+✓ OCR 模型路径: /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR
+✓ 训练数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 验证数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 输出目录: ./adapter_checkpoints
+
+============================================================
+配置 DeepSpeed
+============================================================
+
+============================================================
+验证配置和路径
+============================================================
+
+✓ 基础模型路径: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B
+✓ OCR 模型路径: /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR
+✓ 训练数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 验证数据: /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 输出目录: ./adapter_checkpoints
+
+============================================================
+配置 DeepSpeed
+============================================================
+
+============================================================
+
+============================================================DeepSpeed 配置已生成
+
+============================================================DeepSpeed 配置已生成
+============================================================
+
+配置文件: ./adapter_checkpoints/ds_config_auto.json============================================================
+
+
+ZeRO Stage: 2DeepSpeed 配置已生成配置文件: ./adapter_checkpoints/ds_config_auto.json
+
+
+CPU Offloading: 优化器状态============================================================ZeRO Stage: 2
+
+
+精度: BFloat16CPU Offloading: 优化器状态配置文件: ./adapter_checkpoints/ds_config_auto.json
+
+
+全局 Batch Size: 128精度: BFloat16ZeRO Stage: 2
+
+
+每 GPU Batch Size: 2全局 Batch Size: 128CPU Offloading: 优化器状态
+
+
+梯度累积: 8每 GPU Batch Size: 2精度: BFloat16
+
+
+World Size: 8梯度累积: 8全局 Batch Size: 128
+
+
+============================================================
+
+World Size: 8每 GPU Batch Size: 2
+
+
+========================================================================================================================
+梯度累积: 8
+
+
+创建训练参数World Size: 8
+
+============================================================
+============================================================
+
+============================================================
+
+创建训练参数
+
+============================================================
+
+============================================================
+
+创建训练参数
+============================================================
+
 
 ✓ 训练轮数: 2
 ✓ 每 GPU Batch Size: 2
@@ -450,8 +439,7 @@ World Size: 8
 
 正在加载模型，这可能需要几分钟...
 `torch_dtype` is deprecated! Use `dtype` instead!
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]
+Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]
 ✓ 训练轮数: 2
 ✓ 每 GPU Batch Size: 2
 ✓ 梯度累积: 8
@@ -463,22 +451,10 @@ World Size: 8
 
 正在加载模型，这可能需要几分钟...
 `torch_dtype` is deprecated! Use `dtype` instead!
-
-✓ 训练轮数: 2
-✓ 每 GPU Batch Size: 2
-✓ 梯度累积: 8
-✓ 学习率: 0.0002
-
-============================================================
-初始化模型
-============================================================
-
-正在加载模型，这可能需要几分钟...
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 145.96it/s]
-Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 139.46it/s]
-Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 149.24it/s]
-Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 150.15it/s]
+Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 148.36it/s]
+Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 145.98it/s]
+You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
+You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
 
 ✓ 训练轮数: 2
 ✓ 每 GPU Batch Size: 2
@@ -491,6 +467,20 @@ World Size: 8
 
 正在加载模型，这可能需要几分钟...
 `torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]
+✓ 训练轮数: 2
+✓ 每 GPU Batch Size: 2
+✓ 梯度累积: 8
+✓ 学习率: 0.0002
+
+============================================================
+初始化模型
+============================================================
+
+正在加载模型，这可能需要几分钟...
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 144.99it/s]
+Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 149.81it/s]
 
 ✓ 训练轮数: 2
 ✓ 每 GPU Batch Size: 2
@@ -501,39 +491,49 @@ World Size: 8
 初始化模型
 ============================================================
 
-
-✓ 训练轮数: 2
-✓ 每 GPU Batch Size: 2
-✓ 梯度累积: 8
-✓ 学习率: 0.0002
 正在加载模型，这可能需要几分钟...
-============================================================
-
-初始化模型
-============================================================
-
-正在加载模型，这可能需要几分钟...
-`torch_dtype` is deprecated! Use `dtype` instead!
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 148.26it/s]
-Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 150.57it/s]
-Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 150.46it/s]
 
 ============================================================
 初始化 WandB
 ============================================================
 
-You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
-You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
-You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
-You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
-You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
-You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
-You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
+
+✓ 训练轮数: 2
+✓ 每 GPU Batch Size: 2
+✓ 梯度累积: 8
+✓ 学习率: 0.0002
+
+============================================================
+初始化模型
+============================================================
+
+正在加载模型，这可能需要几分钟...
+
+✓ 训练轮数: 2
+✓ 每 GPU Batch Size: 2
+✓ 梯度累积: 8
+✓ 学习率: 0.0002
+
+============================================================
+初始化模型
+============================================================
+
+正在加载模型，这可能需要几分钟...
+`torch_dtype` is deprecated! Use `dtype` instead!
+`torch_dtype` is deprecated! Use `dtype` instead!
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 148.73it/s]
+Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 142.82it/s]
+Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 147.78it/s]
 Some weights of DeepseekOCRForCausalLM were not initialized from the model checkpoint at /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR and are newly initialized: ['model.vision_model.embeddings.position_ids']
 You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
 Some weights of DeepseekOCRForCausalLM were not initialized from the model checkpoint at /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR and are newly initialized: ['model.vision_model.embeddings.position_ids']
 You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
+You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
+You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
+You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
+You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
 Some weights of DeepseekOCRForCausalLM were not initialized from the model checkpoint at /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR and are newly initialized: ['model.vision_model.embeddings.position_ids']
 You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
 Some weights of DeepseekOCRForCausalLM were not initialized from the model checkpoint at /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR and are newly initialized: ['model.vision_model.embeddings.position_ids']
@@ -546,13 +546,13 @@ Some weights of DeepseekOCRForCausalLM were not initialized from the model check
 You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
 wandb: Currently logged in as: kscolor0523 (kscolor0523-kuaishou) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
 wandb: WARNING Using a boolean value for 'reinit' is deprecated. Use 'return_previous' or 'finish_previous' instead.
-wandb: setting up run 2njynccw
+wandb: setting up run 2rxqvkpm
 wandb: Tracking run with wandb version 0.23.0
-wandb: Run data is saved locally in /mmu_nlp_ssd/tangjingyi03/OCR-MEM/wandb/run-20251205_151946-2njynccw
+wandb: Run data is saved locally in /mmu_nlp_ssd/tangjingyi03/OCR-MEM/wandb/run-20251209_154637-2rxqvkpm
 wandb: Run `wandb offline` to turn off syncing.
 wandb: Syncing run mem_adapter_training
 wandb: ⭐️ View project at https://wandb.ai/kscolor0523-kuaishou/OCR-MEM
-wandb: 🚀 View run at https://wandb.ai/kscolor0523-kuaishou/OCR-MEM/runs/2njynccw
+wandb: 🚀 View run at https://wandb.ai/kscolor0523-kuaishou/OCR-MEM/runs/2rxqvkpm
 ✓ WandB 项目: OCR-MEM
 ✓ WandB 实验: mem_adapter_training
 
@@ -567,109 +567,36 @@ wandb: 🚀 View run at https://wandb.ai/kscolor0523-kuaishou/OCR-MEM/runs/2njyn
 
 正在加载模型，这可能需要几分钟...
 `torch_dtype` is deprecated! Use `dtype` instead!
-Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 144.87it/s]
+Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 5/5 [00:00<00:00, 147.42it/s]
 You are using a model of type deepseek_vl_v2 to instantiate a model of type DeepseekOCR. This is not supported for all configurations of models and can yield errors.
 Some weights of DeepseekOCRForCausalLM were not initialized from the model checkpoint at /mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR and are newly initialized: ['model.vision_model.embeddings.position_ids']
 You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
 ✓ 模型加载完成
-✓ 模型加载完成
-✓ 模型加载完成
-✓ 模型加载完成
-✓ 模型加载完成
 trainable params: 18,882,560 || all params: 8,607,498,496 || trainable%: 0.2194%
+
+Detailed breakdown:
+  base_llm_model trainable params: 0 (should be 0)
+  ocr_embed trainable params: 0 (should be 0)
+  proj trainable params: 18,882,560
 
 ============================================================
 加载数据集
 ============================================================
 
-✓ 模型加载完成
-trainable params: 18,882,560 || all params: 8,607,498,496 || trainable%: 0.2194%
-
-============================================================
-加载数据集
-============================================================
-
-trainable params: 18,882,560 || all params: 8,607,498,496 || trainable%: 0.2194%
-
-============================================================
-加载数据集
-============================================================
-
-trainable params: 18,882,560 || all params: 8,607,498,496 || trainable%: 0.2194%
-
-============================================================
-加载数据集
-============================================================
-
-trainable params: 18,882,560 || all params: 8,607,498,496 || trainable%: 0.2194%
-
-============================================================
-加载数据集
-============================================================
-
-trainable params: 18,882,560 || all params: 8,607,498,496 || trainable%: 0.2194%
-
-============================================================
-加载数据集
-============================================================
-
+Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 训练集: 2549 样本
 ✓ 模型加载完成
 trainable params: 18,882,560 || all params: 8,607,498,496 || trainable%: 0.2194%
 
+Detailed breakdown:
+  base_llm_model trainable params: 0 (should be 0)
+  ocr_embed trainable params: 0 (should be 0)
+  proj trainable params: 18,882,560
+
 ============================================================
 加载数据集
 ============================================================
 
-Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 训练集: 2549 样本
-Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 训练集: 2549 样本
-Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 训练集: 2549 样本
-Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 训练集: 2549 样本
-Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 训练集: 2549 样本
-Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 训练集: 2549 样本
-Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 训练集: 2549 样本
-Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 验证集: 2549 样本
-
-============================================================
-初始化训练器
-============================================================
-
-Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 验证集: 2549 样本
-
-============================================================
-初始化训练器
-============================================================
-
-
-============================================================
-参数统计 (Parameter Statistics)
-============================================================
-可训练参数 (Trainable):     18,882,560
-总参数 (Total):             8,607,498,496
-可训练比例 (Trainable %):   0.2194%
-============================================================
-
-
-============================================================
-/mmu_nlp_ssd/tangjingyi03/OCR-MEM/trainer/adapter_only_trainer.py:174: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `AdapterOnlyTrainer.__init__`. Use `processing_class` instead.
-  super().__init__(model=model, args=args, **kwargs)
-参数统计 (Parameter Statistics)
-============================================================
-可训练参数 (Trainable):     18,882,560
-总参数 (Total):             8,607,498,496
-可训练比例 (Trainable %):   0.2194%
-============================================================
-
-/mmu_nlp_ssd/tangjingyi03/OCR-MEM/trainer/adapter_only_trainer.py:174: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `AdapterOnlyTrainer.__init__`. Use `processing_class` instead.
-  super().__init__(model=model, args=args, **kwargs)
 Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
 ✓ 验证集: 2549 样本
 
@@ -689,6 +616,8 @@ Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_me
 /mmu_nlp_ssd/tangjingyi03/OCR-MEM/trainer/adapter_only_trainer.py:174: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `AdapterOnlyTrainer.__init__`. Use `processing_class` instead.
   super().__init__(model=model, args=args, **kwargs)
 Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 训练集: 2549 样本
+Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
 ✓ 验证集: 2549 样本
 
 ============================================================
@@ -704,11 +633,156 @@ Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_me
 可训练比例 (Trainable %):   0.2194%
 ============================================================
 
+/mmu_nlp_ssd/tangjingyi03/OCR-MEM/trainer/adapter_only_trainer.py:174: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `AdapterOnlyTrainer.__init__`. Use `processing_class` instead.
+  super().__init__(model=model, args=args, **kwargs)
+✓ 训练器初始化完成
+
+============================================================
+开始训练
+============================================================
+
+✓ 训练器初始化完成
+
+============================================================
+开始训练
+============================================================
+
+The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'eos_token_id': 151645, 'pad_token_id': 151643}.
+The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'eos_token_id': 151645, 'pad_token_id': 151643}.
+✓ 模型加载完成
+trainable params: 18,882,560 || all params: 8,607,498,496 || trainable%: 0.2194%
+
+Detailed breakdown:
+  base_llm_model trainable params: 0 (should be 0)
+  ocr_embed trainable params: 0 (should be 0)
+  proj trainable params: 18,882,560
+
+============================================================
+加载数据集
+============================================================
+
+Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 训练集: 2549 样本
 Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
 ✓ 验证集: 2549 样本
 
 ============================================================
 初始化训练器
+============================================================
+
+
+============================================================
+参数统计 (Parameter Statistics)
+============================================================
+可训练参数 (Trainable):     18,882,560
+总参数 (Total):             8,607,498,496
+可训练比例 (Trainable %):   0.2194%
+============================================================
+
+/mmu_nlp_ssd/tangjingyi03/OCR-MEM/trainer/adapter_only_trainer.py:174: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `AdapterOnlyTrainer.__init__`. Use `processing_class` instead.
+  super().__init__(model=model, args=args, **kwargs)
+✓ 模型加载完成
+✓ 模型加载完成
+✓ 模型加载完成
+trainable params: 18,882,560 || all params: 8,607,498,496 || trainable%: 0.2194%
+trainable params: 18,882,560 || all params: 8,607,498,496 || trainable%: 0.2194%
+
+Detailed breakdown:
+  base_llm_model trainable params: 0 (should be 0)
+  ocr_embed trainable params: 0 (should be 0)
+  proj trainable params: 18,882,560
+
+============================================================
+加载数据集
+============================================================
+
+✓ 模型加载完成
+
+Detailed breakdown:
+  base_llm_model trainable params: 0 (should be 0)
+  ocr_embed trainable params: 0 (should be 0)
+  proj trainable params: 18,882,560
+
+============================================================
+加载数据集
+============================================================
+
+trainable params: 18,882,560 || all params: 8,607,498,496 || trainable%: 0.2194%
+
+Detailed breakdown:
+  base_llm_model trainable params: 0 (should be 0)
+  ocr_embed trainable params: 0 (should be 0)
+  proj trainable params: 18,882,560
+
+============================================================
+加载数据集
+============================================================
+
+trainable params: 18,882,560 || all params: 8,607,498,496 || trainable%: 0.2194%
+
+Detailed breakdown:
+  base_llm_model trainable params: 0 (should be 0)
+  ocr_embed trainable params: 0 (should be 0)
+  proj trainable params: 18,882,560
+
+============================================================
+加载数据集
+============================================================
+
+Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 训练集: 2549 样本
+Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 训练集: 2549 样本
+Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 训练集: 2549 样本
+Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 训练集: 2549 样本
+✓ 训练器初始化完成
+
+============================================================
+开始训练
+============================================================
+
+The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'eos_token_id': 151645, 'pad_token_id': 151643}.
+Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 验证集: 2549 样本
+
+============================================================
+初始化训练器
+============================================================
+
+Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 验证集: 2549 样本
+
+============================================================
+初始化训练器
+============================================================
+
+
+============================================================
+参数统计 (Parameter Statistics)
+============================================================
+可训练参数 (Trainable):     18,882,560
+总参数 (Total):             8,607,498,496
+可训练比例 (Trainable %):   0.2194%
+============================================================
+
+/mmu_nlp_ssd/tangjingyi03/OCR-MEM/trainer/adapter_only_trainer.py:174: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `AdapterOnlyTrainer.__init__`. Use `processing_class` instead.
+  super().__init__(model=model, args=args, **kwargs)
+Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
+✓ 验证集: 2549 样本
+
+============================================================
+初始化训练器
+============================================================
+
+
+============================================================
+参数统计 (Parameter Statistics)
+============================================================
+可训练参数 (Trainable):     18,882,560
+总参数 (Total):             8,607,498,496
+可训练比例 (Trainable %):   0.2194%
 ============================================================
 
 /mmu_nlp_ssd/tangjingyi03/OCR-MEM/trainer/adapter_only_trainer.py:174: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `AdapterOnlyTrainer.__init__`. Use `processing_class` instead.
@@ -748,30 +822,7 @@ Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_me
 开始训练
 ============================================================
 
-✓ 训练器初始化完成
-
-============================================================
-开始训练
-============================================================
-
-✓ 训练器初始化完成
-
-============================================================
-开始训练
-============================================================
-
-✓ 训练器初始化完成
-
-============================================================
-开始训练
-============================================================
-
-✓ 训练器初始化完成
-
-============================================================
-开始训练
-============================================================
-
+The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'eos_token_id': 151645, 'pad_token_id': 151643}.
 ✓ 训练器初始化完成
 
 ============================================================
@@ -779,29 +830,13 @@ Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_me
 ============================================================
 
 The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'eos_token_id': 151645, 'pad_token_id': 151643}.
-The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'eos_token_id': 151645, 'pad_token_id': 151643}.
-The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'eos_token_id': 151645, 'pad_token_id': 151643}.
-The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'eos_token_id': 151645, 'pad_token_id': 151643}.
-The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'eos_token_id': 151645, 'pad_token_id': 151643}.
-The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'eos_token_id': 151645, 'pad_token_id': 151643}.
-Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl
-✓ 验证集: 2549 样本
+✓ 训练器初始化完成
 
 ============================================================
-初始化训练器
+开始训练
 ============================================================
 
-
-============================================================
-参数统计 (Parameter Statistics)
-============================================================
-可训练参数 (Trainable):     18,882,560
-总参数 (Total):             8,607,498,496
-可训练比例 (Trainable %):   0.2194%
-============================================================
-
-/mmu_nlp_ssd/tangjingyi03/OCR-MEM/trainer/adapter_only_trainer.py:174: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `AdapterOnlyTrainer.__init__`. Use `processing_class` instead.
-  super().__init__(model=model, args=args, **kwargs)
+The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'eos_token_id': 151645, 'pad_token_id': 151643}.
 ✓ 训练器初始化完成
 
 ============================================================
@@ -811,6 +846,11 @@ Loaded 2549 samples from /mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_me
 The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'eos_token_id': 151645, 'pad_token_id': 151643}.
 ✓ 模型加载完成
 trainable params: 18,882,560 || all params: 8,607,498,496 || trainable%: 0.2194%
+
+Detailed breakdown:
+  base_llm_model trainable params: 0 (should be 0)
+  ocr_embed trainable params: 0 (should be 0)
+  proj trainable params: 18,882,560
 
 ============================================================
 加载数据集
@@ -847,54 +887,17 @@ Gradient accumulation steps mismatch: GradientAccumulationPlugin has 1, DeepSpee
 /mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/utils/cpp_extension.py:2059: UserWarning: TORCH_CUDA_ARCH_LIST is not set, all archs for visible cards are included for compilation. 
 If this is not desired, please set os.environ['TORCH_CUDA_ARCH_LIST'].
   warnings.warn(
-[2025-12-05 15:20:32,813] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
-[2025-12-05 15:20:32,875] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
-[2025-12-05 15:20:32,896] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
-[2025-12-05 15:20:32,901] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
-[2025-12-05 15:20:32,906] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
-[2025-12-05 15:20:32,921] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
-[2025-12-05 15:20:32,927] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
-[2025-12-05 15:20:33,562] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
+[2025-12-09 15:47:53,026] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
+[2025-12-09 15:47:53,026] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
+[2025-12-09 15:47:53,026] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
+[2025-12-09 15:47:53,027] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
+[2025-12-09 15:47:53,027] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
+[2025-12-09 15:47:53,028] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
+[2025-12-09 15:47:53,032] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
+[2025-12-09 15:47:53,631] [WARNING] [lr_schedules.py:690:get_lr] Attempting to get learning rate from scheduler before it has started
 WARNING:root:base_model_name is empty, model may not initialize correctly
 WARNING:root:ocr_model_name is empty, model may not initialize correctly
-  0%|          | 0/40 [00:00<?, ?it/s][rank5]: Traceback (most recent call last):
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 797, in <module>
-[rank5]:     main()
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 764, in main
-[rank5]:     train_result = trainer.train(resume_from_checkpoint=checkpoint)
-[rank5]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 2325, in train
-[rank5]:     return inner_training_loop(
-[rank5]:            ^^^^^^^^^^^^^^^^^^^^
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 2674, in _inner_training_loop
-[rank5]:     tr_loss_step = self.training_step(model, inputs, num_items_in_batch)
-[rank5]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 4071, in training_step
-[rank5]:     self.accelerator.backward(loss, **kwargs)
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/accelerate/accelerator.py", line 2844, in backward
-[rank5]:     self.deepspeed_engine_wrapped.backward(loss, sync_gradients=self.sync_gradients, **kwargs)
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/accelerate/utils/deepspeed.py", line 270, in backward
-[rank5]:     self.engine.backward(loss, **kwargs)
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/utils/nvtx.py", line 20, in wrapped_fn
-[rank5]:     ret_val = func(*args, **kwargs)
-[rank5]:               ^^^^^^^^^^^^^^^^^^^^^
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/engine.py", line 2356, in backward
-[rank5]:     self._do_optimizer_backward(loss, retain_graph)
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/engine.py", line 2297, in _do_optimizer_backward
-[rank5]:     self.optimizer.backward(loss, retain_graph=retain_graph)
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/zero/stage_1_and_2.py", line 2245, in backward
-[rank5]:     self.loss_scaler.backward(loss.float(), retain_graph=retain_graph)
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/fp16/loss_scaler.py", line 65, in backward
-[rank5]:     scaled_loss.backward(retain_graph=retain_graph)
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
-[rank5]:     torch.autograd.backward(
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
-[rank5]:     _engine_run_backward(
-[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
-[rank5]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
-[rank5]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[rank5]: RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn
-[rank4]: Traceback (most recent call last):
+  0%|          | 0/40 [00:00<?, ?it/s][rank4]: Traceback (most recent call last):
 [rank4]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 797, in <module>
 [rank4]:     main()
 [rank4]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 764, in main
@@ -931,6 +934,80 @@ WARNING:root:ocr_model_name is empty, model may not initialize correctly
 [rank4]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
 [rank4]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 [rank4]: RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn
+[rank5]: Traceback (most recent call last):
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 797, in <module>
+[rank5]:     main()
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 764, in main
+[rank5]:     train_result = trainer.train(resume_from_checkpoint=checkpoint)
+[rank5]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 2325, in train
+[rank5]:     return inner_training_loop(
+[rank5]:            ^^^^^^^^^^^^^^^^^^^^
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 2674, in _inner_training_loop
+[rank5]:     tr_loss_step = self.training_step(model, inputs, num_items_in_batch)
+[rank5]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 4071, in training_step
+[rank5]:     self.accelerator.backward(loss, **kwargs)
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/accelerate/accelerator.py", line 2844, in backward
+[rank5]:     self.deepspeed_engine_wrapped.backward(loss, sync_gradients=self.sync_gradients, **kwargs)
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/accelerate/utils/deepspeed.py", line 270, in backward
+[rank5]:     self.engine.backward(loss, **kwargs)
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/utils/nvtx.py", line 20, in wrapped_fn
+[rank5]:     ret_val = func(*args, **kwargs)
+[rank5]:               ^^^^^^^^^^^^^^^^^^^^^
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/engine.py", line 2356, in backward
+[rank5]:     self._do_optimizer_backward(loss, retain_graph)
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/engine.py", line 2297, in _do_optimizer_backward
+[rank5]:     self.optimizer.backward(loss, retain_graph=retain_graph)
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/zero/stage_1_and_2.py", line 2245, in backward
+[rank5]:     self.loss_scaler.backward(loss.float(), retain_graph=retain_graph)
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/fp16/loss_scaler.py", line 65, in backward
+[rank5]:     scaled_loss.backward(retain_graph=retain_graph)
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+[rank5]:     torch.autograd.backward(
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+[rank5]:     _engine_run_backward(
+[rank5]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+[rank5]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[rank5]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank5]: RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn
+[rank2]: Traceback (most recent call last):
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 797, in <module>
+[rank2]:     main()
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 764, in main
+[rank2]:     train_result = trainer.train(resume_from_checkpoint=checkpoint)
+[rank2]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 2325, in train
+[rank2]:     return inner_training_loop(
+[rank2]:            ^^^^^^^^^^^^^^^^^^^^
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 2674, in _inner_training_loop
+[rank2]:     tr_loss_step = self.training_step(model, inputs, num_items_in_batch)
+[rank2]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 4071, in training_step
+[rank2]:     self.accelerator.backward(loss, **kwargs)
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/accelerate/accelerator.py", line 2844, in backward
+[rank2]:     self.deepspeed_engine_wrapped.backward(loss, sync_gradients=self.sync_gradients, **kwargs)
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/accelerate/utils/deepspeed.py", line 270, in backward
+[rank2]:     self.engine.backward(loss, **kwargs)
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/utils/nvtx.py", line 20, in wrapped_fn
+[rank2]:     ret_val = func(*args, **kwargs)
+[rank2]:               ^^^^^^^^^^^^^^^^^^^^^
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/engine.py", line 2356, in backward
+[rank2]:     self._do_optimizer_backward(loss, retain_graph)
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/engine.py", line 2297, in _do_optimizer_backward
+[rank2]:     self.optimizer.backward(loss, retain_graph=retain_graph)
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/zero/stage_1_and_2.py", line 2245, in backward
+[rank2]:     self.loss_scaler.backward(loss.float(), retain_graph=retain_graph)
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/fp16/loss_scaler.py", line 65, in backward
+[rank2]:     scaled_loss.backward(retain_graph=retain_graph)
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+[rank2]:     torch.autograd.backward(
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+[rank2]:     _engine_run_backward(
+[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+[rank2]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[rank2]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank2]: RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn
 [rank1]: Traceback (most recent call last):
 [rank1]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 797, in <module>
 [rank1]:     main()
@@ -1005,6 +1082,44 @@ WARNING:root:ocr_model_name is empty, model may not initialize correctly
 [rank7]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
 [rank7]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 [rank7]: RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn
+[rank3]: Traceback (most recent call last):
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 797, in <module>
+[rank3]:     main()
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 764, in main
+[rank3]:     train_result = trainer.train(resume_from_checkpoint=checkpoint)
+[rank3]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 2325, in train
+[rank3]:     return inner_training_loop(
+[rank3]:            ^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 2674, in _inner_training_loop
+[rank3]:     tr_loss_step = self.training_step(model, inputs, num_items_in_batch)
+[rank3]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 4071, in training_step
+[rank3]:     self.accelerator.backward(loss, **kwargs)
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/accelerate/accelerator.py", line 2844, in backward
+[rank3]:     self.deepspeed_engine_wrapped.backward(loss, sync_gradients=self.sync_gradients, **kwargs)
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/accelerate/utils/deepspeed.py", line 270, in backward
+[rank3]:     self.engine.backward(loss, **kwargs)
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/utils/nvtx.py", line 20, in wrapped_fn
+[rank3]:     ret_val = func(*args, **kwargs)
+[rank3]:               ^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/engine.py", line 2356, in backward
+[rank3]:     self._do_optimizer_backward(loss, retain_graph)
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/engine.py", line 2297, in _do_optimizer_backward
+[rank3]:     self.optimizer.backward(loss, retain_graph=retain_graph)
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/zero/stage_1_and_2.py", line 2245, in backward
+[rank3]:     self.loss_scaler.backward(loss.float(), retain_graph=retain_graph)
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/fp16/loss_scaler.py", line 65, in backward
+[rank3]:     scaled_loss.backward(retain_graph=retain_graph)
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+[rank3]:     torch.autograd.backward(
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+[rank3]:     _engine_run_backward(
+[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+[rank3]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[rank3]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]: RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn
+Traceback (most recent call last):
 [rank6]: Traceback (most recent call last):
 [rank6]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 797, in <module>
 [rank6]:     main()
@@ -1042,44 +1157,6 @@ WARNING:root:ocr_model_name is empty, model may not initialize correctly
 [rank6]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
 [rank6]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 [rank6]: RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn
-Traceback (most recent call last):
-[rank2]: Traceback (most recent call last):
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 797, in <module>
-[rank2]:     main()
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 764, in main
-[rank2]:     train_result = trainer.train(resume_from_checkpoint=checkpoint)
-[rank2]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 2325, in train
-[rank2]:     return inner_training_loop(
-[rank2]:            ^^^^^^^^^^^^^^^^^^^^
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 2674, in _inner_training_loop
-[rank2]:     tr_loss_step = self.training_step(model, inputs, num_items_in_batch)
-[rank2]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 4071, in training_step
-[rank2]:     self.accelerator.backward(loss, **kwargs)
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/accelerate/accelerator.py", line 2844, in backward
-[rank2]:     self.deepspeed_engine_wrapped.backward(loss, sync_gradients=self.sync_gradients, **kwargs)
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/accelerate/utils/deepspeed.py", line 270, in backward
-[rank2]:     self.engine.backward(loss, **kwargs)
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/utils/nvtx.py", line 20, in wrapped_fn
-[rank2]:     ret_val = func(*args, **kwargs)
-[rank2]:               ^^^^^^^^^^^^^^^^^^^^^
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/engine.py", line 2356, in backward
-[rank2]:     self._do_optimizer_backward(loss, retain_graph)
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/engine.py", line 2297, in _do_optimizer_backward
-[rank2]:     self.optimizer.backward(loss, retain_graph=retain_graph)
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/zero/stage_1_and_2.py", line 2245, in backward
-[rank2]:     self.loss_scaler.backward(loss.float(), retain_graph=retain_graph)
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/fp16/loss_scaler.py", line 65, in backward
-[rank2]:     scaled_loss.backward(retain_graph=retain_graph)
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
-[rank2]:     torch.autograd.backward(
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
-[rank2]:     _engine_run_backward(
-[rank2]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
-[rank2]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
-[rank2]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[rank2]: RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn
   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 797, in <module>
     main()
   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 764, in main
@@ -1153,52 +1230,15 @@ RuntimeError: element 0 of tensors does not require grad and does not have a gra
 [rank0]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
 [rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 [rank0]: RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn
-[rank3]: Traceback (most recent call last):
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 797, in <module>
-[rank3]:     main()
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/run_training.py", line 764, in main
-[rank3]:     train_result = trainer.train(resume_from_checkpoint=checkpoint)
-[rank3]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 2325, in train
-[rank3]:     return inner_training_loop(
-[rank3]:            ^^^^^^^^^^^^^^^^^^^^
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 2674, in _inner_training_loop
-[rank3]:     tr_loss_step = self.training_step(model, inputs, num_items_in_batch)
-[rank3]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/OCR-MEM/transformers/trainer.py", line 4071, in training_step
-[rank3]:     self.accelerator.backward(loss, **kwargs)
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/accelerate/accelerator.py", line 2844, in backward
-[rank3]:     self.deepspeed_engine_wrapped.backward(loss, sync_gradients=self.sync_gradients, **kwargs)
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/accelerate/utils/deepspeed.py", line 270, in backward
-[rank3]:     self.engine.backward(loss, **kwargs)
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/utils/nvtx.py", line 20, in wrapped_fn
-[rank3]:     ret_val = func(*args, **kwargs)
-[rank3]:               ^^^^^^^^^^^^^^^^^^^^^
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/engine.py", line 2356, in backward
-[rank3]:     self._do_optimizer_backward(loss, retain_graph)
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/engine.py", line 2297, in _do_optimizer_backward
-[rank3]:     self.optimizer.backward(loss, retain_graph=retain_graph)
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/zero/stage_1_and_2.py", line 2245, in backward
-[rank3]:     self.loss_scaler.backward(loss.float(), retain_graph=retain_graph)
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/deepspeed/runtime/fp16/loss_scaler.py", line 65, in backward
-[rank3]:     scaled_loss.backward(retain_graph=retain_graph)
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
-[rank3]:     torch.autograd.backward(
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
-[rank3]:     _engine_run_backward(
-[rank3]:   File "/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
-[rank3]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
-[rank3]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[rank3]: RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn
-[2025-12-05 15:20:37,770] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1545838
-[2025-12-05 15:20:38,893] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1545839
-[2025-12-05 15:20:38,898] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1545840
-[2025-12-05 15:20:38,902] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1545841
-[2025-12-05 15:20:38,906] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1545842
-[2025-12-05 15:20:38,907] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1545843
-[2025-12-05 15:20:38,911] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1545844
-[2025-12-05 15:20:38,915] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1545845
-[2025-12-05 15:20:38,919] [ERROR] [launch.py:341:sigkill_handler] ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=7', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training'] exits with return code = 1
+[2025-12-09 15:47:58,360] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1753061
+[2025-12-09 15:47:59,667] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1753062
+[2025-12-09 15:47:59,672] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1753063
+[2025-12-09 15:47:59,675] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1753064
+[2025-12-09 15:47:59,675] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1753065
+[2025-12-09 15:47:59,678] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1753066
+[2025-12-09 15:47:59,682] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1753067
+[2025-12-09 15:47:59,685] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 1753068
+[2025-12-09 15:47:59,688] [ERROR] [launch.py:341:sigkill_handler] ['/mmu_nlp_ssd/tangjingyi03/miniconda/envs/mem_new/bin/python3.12', '-u', 'run_training.py', '--local_rank=7', '--base_model_path', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/model/Qwen/Qwen3-8B', '--ocr_model_path', '/mmu_nlp_ssd/tangjingyi03/models/deepseek-ai/DeepSeek-OCR', '--train_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--eval_data', '/mmu_nlp_ssd/tangjingyi03/OCR-MEM/data/train_data_of_merged_total_66025_rmtestset_first_100.jsonl', '--output_dir', './adapter_checkpoints', '--num_epochs', '2', '--batch_size', '2', '--gradient_accumulation', '8', '--learning_rate', '2e-4', '--wandb_project', 'OCR-MEM', '--wandb_run_name', 'mem_adapter_training'] exits with return code = 1
 
 ============================================================
 ❌ 训练失败，请检查错误日志
