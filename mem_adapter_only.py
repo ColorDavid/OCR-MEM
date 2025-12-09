@@ -455,12 +455,13 @@ class MEMModel(PreTrainedModel):
             
             # 左padding embeddings
             if pad_len > 0:
-                # 使用zeros_like确保dtype和device匹配，保持梯度计算图
+                # 关键修复：不设置requires_grad=False！
+                # 虽然padding本身是常数，但不能断开梯度链
+                # torch.cat会自动保持requires_grad=True（如果任一输入有梯度）
                 pad_embeds = torch.zeros(
                     pad_len, hidden_size, 
                     device=device, 
-                    dtype=inputs_embeds.dtype,
-                    requires_grad=False  # padding不需要梯度
+                    dtype=inputs_embeds.dtype
                 )
                 padded_emb = torch.cat([pad_embeds, final_embeds_list[i]], dim=0)
             else:
