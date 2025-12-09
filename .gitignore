@@ -14,8 +14,8 @@ runs/
 *.safetensors
 
 # 日志
-*.log
-logs/
+# *.log
+# logs/
 
 # Python 缓存
 __pycache__/
