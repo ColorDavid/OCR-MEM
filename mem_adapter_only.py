@@ -390,14 +390,45 @@ class MEMModel(PreTrainedModel):
                 images = [images]
             
             # 3. 通过OCR编码器提取每张图像的视觉特征并拼接
-            # 关键修复：不使用torch.no_grad()！
-            # 虽然OCR参数冻结(requires_grad=False)，但梯度必须流过OCR模块
-            # 才能反向传播到proj层。no_grad()会完全断开计算图。
+            # 
+            # 关键问题：DeepSeekOCREncoder 使用了 @torch.inference_mode() 装饰器
+            # 这会断开整个计算图！我们需要绕过 encode() 方法，直接调用内部的 forward
+            # 
+            # 解决方案：直接调用 _encode_single_image 并手动处理梯度
             vision_features_list = []
             for img in images:
-                # OCR编码: [1, N, 1024] where N=256 for 1024x1024 input
-                # 保持在计算图中，允许梯度流动
-                img_features = self.ocr_embed(img)
+                # 绕过 @torch.inference_mode() 装饰器
+                # 直接进行前向传播，确保梯度流动
+                
+                # 预处理图像 (使用OCR encoder的预处理)
+                if isinstance(img, str):
+                    from PIL import Image as PILImage
+                    img_pil = PILImage.open(img).convert("RGB")
+                else:
+                    img_pil = img.convert("RGB")
+                
+                # 使用OCR encoder的预处理pipeline
+                if hasattr(self.ocr_embed, '_preproc_1024') and self.ocr_embed._preproc_1024 is not None:
+                    x_cpu = self.ocr_embed._preproc_1024(img_pil).unsqueeze(0)
+                else:
+                    # 如果没有预处理pipeline，使用默认的
+                    import torchvision.transforms as T
+                    preprocess = T.Compose([
+                        T.Resize((1024, 1024)),
+                        T.ToTensor(),
+                        T.Normalize(mean=(0.48145466, 0.4578275, 0.40821073),
+                                  std=(0.26862954, 0.26130258, 0.27577711))
+                    ])
+                    x_cpu = preprocess(img_pil).unsqueeze(0)
+                
+                # 移到设备并设置为channels_last格式
+                x = x_cpu.to(self.ocr_embed.device, dtype=self.ocr_embed.dtype)
+                x = x.to(memory_format=torch.channels_last)
+                
+                # 直接调用 _forward_core，不通过 @torch.inference_mode() 装饰的方法
+                # 这确保梯度可以流动
+                img_features = self.ocr_embed._forward_core(x)  # [1, N, 1024]
+                
                 # 处理不同维度情况，最终得到 [N, 1024] 形状
                 if img_features.dim() == 3:
                     # [1, N, 1024] -> [N, 1024] (去除batch维度)
