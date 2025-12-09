@@ -170,6 +170,10 @@ class AdapterOnlyTrainer(Trainer):
         # 这很重要，因为 Trainer 会根据 requires_grad 创建优化器
         self._setup_trainable_params(model, args)
         
+        # 修复：将tokenizer重命名为processing_class以避免弃用警告
+        if 'tokenizer' in kwargs and 'processing_class' not in kwargs:
+            kwargs['processing_class'] = kwargs.pop('tokenizer')
+        
         # 调用父类初始化
         super().__init__(model=model, args=args, **kwargs)
     

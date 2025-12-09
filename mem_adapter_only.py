@@ -20,7 +20,7 @@ from deepseek_ocr_encoder import DeepSeekOCREncoder
 
 
 class MEMConfig(PretrainedConfig):
-    # model_type = "mem_model"
+    model_type = "mem_model"
     
     def __init__(
         self, 
@@ -36,11 +36,8 @@ class MEMConfig(PretrainedConfig):
         self.vision_embedding_size = vision_embedding_size
         self.context_threshold = context_threshold
         
-        # 验证必要参数
-        if not base_model_name:
-            logging.warning("base_model_name is empty, model may not initialize correctly")
-        if not ocr_model_name:
-            logging.warning("ocr_model_name is empty, model may not initialize correctly")
+        # 修复：在加载预训练模型时允许空参数，但在实例化新模型时进行验证
+        # 这避免了from_pretrained时的不必要警告
 
 
 class MEMModel(PreTrainedModel):
@@ -58,6 +55,18 @@ class MEMModel(PreTrainedModel):
 
     def __init__(self, config: MEMConfig):
         super().__init__(config)
+        
+        # 验证配置参数（修复：避免运行时的配置错误）
+        if not config.base_llm_model_name:
+            raise ValueError(
+                "config.base_llm_model_name 不能为空！\n"
+                "请在创建MEMConfig时指定base_model_name参数。"
+            )
+        if not config.ocr_model_name:
+            raise ValueError(
+                "config.ocr_model_name 不能为空！\n"
+                "请在创建MEMConfig时指定ocr_model_name参数。"
+            )
         
         # 基础语言模型
         self.base_llm_model = AutoModelForCausalLM.from_pretrained(
@@ -381,10 +390,13 @@ class MEMModel(PreTrainedModel):
                 images = [images]
             
             # 3. 通过OCR编码器提取每张图像的视觉特征并拼接
+            # 关键修复：不使用torch.no_grad()！
+            # 虽然OCR参数冻结(requires_grad=False)，但梯度必须流过OCR模块
+            # 才能反向传播到proj层。no_grad()会完全断开计算图。
             vision_features_list = []
-            # with torch.no_grad():
             for img in images:
                 # OCR编码: [1, N, 1024] where N=256 for 1024x1024 input
+                # 保持在计算图中，允许梯度流动
                 img_features = self.ocr_embed(img)
                 # 处理不同维度情况，最终得到 [N, 1024] 形状
                 if img_features.dim() == 3:
