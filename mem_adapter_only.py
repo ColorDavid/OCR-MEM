@@ -614,17 +614,17 @@ class MEMModel(PreTrainedModel):
             **kwargs
         )
         
-        # 调试：在第一次调用时打印梯度流信息
-        if not hasattr(self, '_debug_printed'):
-            self._debug_printed = True
-            print("\n" + "="*60)
-            print("梯度流检查:")
-            print(f"  final_embeds.requires_grad: {final_embeds.requires_grad}")
-            if hasattr(outputs, 'loss') and outputs.loss is not None:
-                print(f"  loss.requires_grad: {outputs.loss.requires_grad}")
-                print(f"  loss value: {outputs.loss.item():.4f}")
-            print(f"  proj.weight.requires_grad: {self.proj.weight.requires_grad}")
-            print(f"  proj.weight.grad: {self.proj.weight.grad}")
-            print("="*60 + "\n")
+        # # 调试：在第一次调用时打印梯度流信息
+        # if not hasattr(self, '_debug_printed'):
+        #     self._debug_printed = True
+        #     print("\n" + "="*60)
+        #     print("梯度流检查:")
+        #     print(f"  final_embeds.requires_grad: {final_embeds.requires_grad}")
+        #     if hasattr(outputs, 'loss') and outputs.loss is not None:
+        #         print(f"  loss.requires_grad: {outputs.loss.requires_grad}")
+        #         print(f"  loss value: {outputs.loss.item():.4f}")
+        #     print(f"  proj.weight.requires_grad: {self.proj.weight.requires_grad}")
+        #     print(f"  proj.weight.grad: {self.proj.weight.grad}")
+        #     print("="*60 + "\n")
         
         return outputs
