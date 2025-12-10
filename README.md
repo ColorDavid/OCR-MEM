@@ -26,7 +26,20 @@ bash run_training.sh
 
 **问题**：训练时出现 `RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn`
 
-**原因**：使用的 `deepseek-ocr-encoder` 库在 `encode()` 方法上使用了 `@torch.inference_mode()` 装饰器，导致梯度无法流动。
+**根本原因**：`deepseek-ocr-encoder` 库的**所有前向传播方法**都被 `@torch.inference_mode()` 装饰，包括:
+- `encode()` 方法 (第 416 行)
+- `_forward_core()` 方法 (第 394 行) ← **这是关键发现!**
+
+这导致即使我们绕过 `encode()` 直接调用 `_forward_core()`,梯度仍然会断裂。
+
+**最终解决方案**：在 `mem_adapter_only.py` 中完全绕过所有装饰的方法，直接手动调用底层组件：
+- `self.ocr_embed.sam(x)` - SAM encoder
+- `self.ocr_embed.clip_pre(tokens)` - CLIP pre-layernorm  
+- `self.ocr_embed.clip_tr(x_tok)` - CLIP transformer
+
+这样可以保持梯度流动,因为这些底层模块没有被 `@torch.inference_mode()` 装饰。
+
+**详细技术分析**：请查看 `CRITICAL_FINDING.md`
 
 **解决方案**：在 `mem_adapter_only.py` 中绕过 `encode()` 方法，直接调用内部的 `_forward_core()` 方法，确保梯度正常流动。
 

@@ -391,15 +391,13 @@ class MEMModel(PreTrainedModel):
             
             # 3. 通过OCR编码器提取每张图像的视觉特征并拼接
             # 
-            # 关键问题：DeepSeekOCREncoder 使用了 @torch.inference_mode() 装饰器
-            # 这会断开整个计算图！我们需要绕过 encode() 方法，直接调用内部的 forward
+            # 关键问题：DeepSeekOCREncoder 所有方法都使用了 @torch.inference_mode() 装饰器
+            # 包括 encode(), _forward_core() 等,这会完全断开计算图！
             # 
-            # 解决方案：直接调用 _encode_single_image 并手动处理梯度
+            # 解决方案：完全绕过所有装饰的方法，直接调用底层的 SAM + CLIP 组件
+            # 手动实现前向传播逻辑，确保梯度可以流动
             vision_features_list = []
             for img in images:
-                # 绕过 @torch.inference_mode() 装饰器
-                # 直接进行前向传播，确保梯度流动
-                
                 # 预处理图像 (使用OCR encoder的预处理)
                 if isinstance(img, str):
                     from PIL import Image as PILImage
@@ -425,9 +423,40 @@ class MEMModel(PreTrainedModel):
                 x = x_cpu.to(self.ocr_embed.device, dtype=self.ocr_embed.dtype)
                 x = x.to(memory_format=torch.channels_last)
                 
-                # 直接调用 _forward_core，不通过 @torch.inference_mode() 装饰的方法
-                # 这确保梯度可以流动
-                img_features = self.ocr_embed._forward_core(x)  # [1, N, 1024]
+                # ==========================================
+                # 手动实现 _forward_core 的逻辑,但不使用装饰器
+                # 这样可以保持梯度流动
+                # ==========================================
+                
+                # Step 1: SAM encoder
+                sam_out = self.ocr_embed.sam(x)  # [1, 1024, Hs, Ws]
+                B, C, Hs, Ws = sam_out.shape
+                
+                # Step 2: Flatten and transpose
+                tokens = sam_out.flatten(2).transpose(1, 2).contiguous()  # [1, N, 1024]
+                
+                # Step 3: Add position embeddings
+                # 使用预计算的位置编码（如果可用）
+                if Hs == 16 and Ws == 16 and hasattr(self.ocr_embed, '_pos_fixed_16') and self.ocr_embed._pos_fixed_16 is not None:
+                    pos = self.ocr_embed._pos_fixed_16
+                else:
+                    # 动态计算位置编码
+                    import math
+                    table = self.ocr_embed.clip_pos_table
+                    grid_size = int(math.isqrt(table.size(0) - 1))
+                    base_grid = table[1: 1 + grid_size * grid_size].view(grid_size, grid_size, self.ocr_embed.embed_dim)
+                    base_grid = base_grid.permute(2, 0, 1).unsqueeze(0)  # [1,1024,G,G]
+                    if (Hs, Ws) != (grid_size, grid_size):
+                        base_grid = torch.nn.functional.interpolate(
+                            base_grid, size=(Hs, Ws), mode="bicubic", align_corners=False
+                        )
+                    pos = base_grid.flatten(2).transpose(1, 2).contiguous()  # [1,N,1024]
+                
+                # Step 4: CLIP processing
+                tokens_plus = tokens + pos
+                x_tok = self.ocr_embed.clip_pre(tokens_plus)
+                x_tok = self.ocr_embed.clip_tr(x_tok)
+                img_features = tokens + x_tok  # [1, N, 1024]
                 
                 # 处理不同维度情况，最终得到 [N, 1024] 形状
                 if img_features.dim() == 3:
