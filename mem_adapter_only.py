@@ -391,25 +391,23 @@ class MEMModel(PreTrainedModel):
             
             # 3. 通过OCR编码器提取每张图像的视觉特征并拼接
             # 
-            # 关键问题：DeepSeekOCREncoder 所有方法都使用了 @torch.inference_mode() 装饰器
-            # 包括 encode(), _forward_core() 等,这会完全断开计算图！
+            # 关键：OCR encoder 的所有方法都有 @torch.inference_mode() 装饰器
+            # 解决方案：手动调用底层组件，并确保整个流程中梯度不断开
             # 
-            # 解决方案：完全绕过所有装饰的方法，直接调用底层的 SAM + CLIP 组件
-            # 手动实现前向传播逻辑，确保梯度可以流动
+            # 注意：只有 proj 层需要梯度，OCR encoder 是冻结的，但必须允许梯度流过
             vision_features_list = []
             for img in images:
-                # 预处理图像 (使用OCR encoder的预处理)
+                # 预处理图像
                 if isinstance(img, str):
                     from PIL import Image as PILImage
                     img_pil = PILImage.open(img).convert("RGB")
                 else:
                     img_pil = img.convert("RGB")
                 
-                # 使用OCR encoder的预处理pipeline
+                # 使用OCR encoder的预处理pipeline，但在之后detach并重新设置梯度
                 if hasattr(self.ocr_embed, '_preproc_1024') and self.ocr_embed._preproc_1024 is not None:
                     x_cpu = self.ocr_embed._preproc_1024(img_pil).unsqueeze(0)
                 else:
-                    # 如果没有预处理pipeline，使用默认的
                     import torchvision.transforms as T
                     preprocess = T.Compose([
                         T.Resize((1024, 1024)),
@@ -419,24 +417,26 @@ class MEMModel(PreTrainedModel):
                     ])
                     x_cpu = preprocess(img_pil).unsqueeze(0)
                 
-                # 移到设备并设置为channels_last格式
+                # 移到设备 - 关键：创建一个新的需要梯度的张量
                 x = x_cpu.to(self.ocr_embed.device, dtype=self.ocr_embed.dtype)
                 x = x.to(memory_format=torch.channels_last)
                 
+                # 关键：确保 x 有梯度，即使 OCR encoder 参数是冻结的
+                # 这样梯度可以流过 OCR encoder 到达 proj 层
+                x = x.detach().requires_grad_(True)
+                
                 # ==========================================
-                # 手动实现 _forward_core 的逻辑,但不使用装饰器
-                # 这样可以保持梯度流动
+                # 手动实现前向传播，不使用任何装饰的方法
                 # ==========================================
                 
-                # Step 1: SAM encoder
+                # Step 1: SAM encoder (参数冻结，但允许梯度流过)
                 sam_out = self.ocr_embed.sam(x)  # [1, 1024, Hs, Ws]
                 B, C, Hs, Ws = sam_out.shape
                 
                 # Step 2: Flatten and transpose
                 tokens = sam_out.flatten(2).transpose(1, 2).contiguous()  # [1, N, 1024]
                 
-                # Step 3: Add position embeddings
-                # 使用预计算的位置编码（如果可用）
+                # Step 3: Add position embeddings (buffer, 无梯度)
                 if Hs == 16 and Ws == 16 and hasattr(self.ocr_embed, '_pos_fixed_16') and self.ocr_embed._pos_fixed_16 is not None:
                     pos = self.ocr_embed._pos_fixed_16
                 else:
@@ -447,16 +447,20 @@ class MEMModel(PreTrainedModel):
                     base_grid = table[1: 1 + grid_size * grid_size].view(grid_size, grid_size, self.ocr_embed.embed_dim)
                     base_grid = base_grid.permute(2, 0, 1).unsqueeze(0)  # [1,1024,G,G]
                     if (Hs, Ws) != (grid_size, grid_size):
-                        base_grid = torch.nn.functional.interpolate(
+                        base_grid = F.interpolate(
                             base_grid, size=(Hs, Ws), mode="bicubic", align_corners=False
                         )
                     pos = base_grid.flatten(2).transpose(1, 2).contiguous()  # [1,N,1024]
                 
-                # Step 4: CLIP processing
+                # Step 4: CLIP processing (参数冻结，但允许梯度流过)
                 tokens_plus = tokens + pos
                 x_tok = self.ocr_embed.clip_pre(tokens_plus)
                 x_tok = self.ocr_embed.clip_tr(x_tok)
                 img_features = tokens + x_tok  # [1, N, 1024]
+                
+                # 确保 img_features 有梯度
+                # 虽然 OCR encoder 参数不更新，但梯度必须能流到 proj 层
+                assert img_features.requires_grad, "img_features 必须有梯度!"
                 
                 # 处理不同维度情况，最终得到 [N, 1024] 形状
                 if img_features.dim() == 3:
@@ -473,19 +477,41 @@ class MEMModel(PreTrainedModel):
             # 拼接所有图像的特征: [total_tokens, 1024]
             vision_features = torch.cat(vision_features_list, dim=0)
             
+            # 确保拼接后仍有梯度
+            assert vision_features.requires_grad, "vision_features 必须有梯度!"
+            
             # 4. 投影到语言模型的隐藏空间: [total_tokens, hidden_size]
+            # proj 层是可训练的，这里会累积梯度
             vision_embeds = self.proj(vision_features)
+            
+            # 确保 proj 输出有梯度
+            assert vision_embeds.requires_grad, "vision_embeds (proj输出) 必须有梯度!"
             
             # 5. 提取保留部分（last_assistant_pos到结尾）
             remaining_embeds = inputs_embeds[b, last_assistant_pos:]  # [remaining_len, hidden_size]
             remaining_mask = attention_mask[b, last_assistant_pos:]   # [remaining_len]
             
             # 6. 拼接：vision_embeds + remaining_embeds
-            current_embeds = torch.cat([vision_embeds, remaining_embeds], dim=0)  # [1+remaining_len, hidden_size]
+            # 关键问题：remaining_embeds 来自冻结的 embedding，没有梯度
+            # 解决方案：创建一个新的张量，只有 vision_embeds 部分有梯度
+            if remaining_embeds.shape[0] > 0:
+                # 将 remaining_embeds detach 并复制到新张量中
+                # 这样可以避免梯度传播到冻结的 embedding
+                remaining_embeds_detached = remaining_embeds.detach()
+                
+                # 拼接：前面部分有梯度，后面部分无梯度
+                current_embeds = torch.cat([vision_embeds, remaining_embeds_detached], dim=0)
+            else:
+                current_embeds = vision_embeds
+            
+            # 验证：current_embeds 应该有梯度（来自 vision_embeds）
+            # 梯度会流向 vision_embeds 部分，remaining_embeds 部分被忽略
+            assert current_embeds.requires_grad, f"current_embeds 必须有梯度! vision_embeds.requires_grad={vision_embeds.requires_grad}"
+            
             current_mask = torch.cat([
                 torch.ones(vision_embeds.shape[0], device=device, dtype=attention_mask.dtype),
                 remaining_mask
-            ], dim=0)  # [1+remaining_len]
+            ], dim=0)
             
             # 7. 处理labels
             if labels is not None:
@@ -515,17 +541,24 @@ class MEMModel(PreTrainedModel):
             
             # 左padding embeddings
             if pad_len > 0:
-                # 关键修复：不设置requires_grad=False！
-                # 虽然padding本身是常数，但不能断开梯度链
-                # torch.cat会自动保持requires_grad=True（如果任一输入有梯度）
+                # 关键：创建 padding 时不影响梯度
+                # torch.cat 会保留输入中有梯度的部分
                 pad_embeds = torch.zeros(
                     pad_len, hidden_size, 
                     device=device, 
                     dtype=inputs_embeds.dtype
                 )
+                # padding 没有梯度，但不影响 final_embeds_list[i] 的梯度
                 padded_emb = torch.cat([pad_embeds, final_embeds_list[i]], dim=0)
             else:
                 padded_emb = final_embeds_list[i]
+            
+            # 验证：如果原始序列有梯度，padding 后也应该有
+            if not padded_emb.requires_grad and final_embeds_list[i].requires_grad:
+                print(f"WARNING: padding 导致梯度丢失! batch {i}")
+                # 尝试恢复
+                padded_emb = padded_emb.detach().requires_grad_(True)
+            
             padded_embeds.append(padded_emb)
             
             # 左padding attention mask
@@ -550,6 +583,13 @@ class MEMModel(PreTrainedModel):
         final_masks = torch.stack(padded_masks, dim=0)     # [batch_size, max_len]
         final_labels = torch.stack(padded_labels, dim=0) if labels is not None else None
         
+        # 检查：确保输入到 LLM 的 embeddings 有梯度
+        if not final_embeds.requires_grad:
+            print("WARNING: final_embeds 没有梯度! 这会导致训练失败。")
+            print(f"  检查 padded_embeds: {[e.requires_grad for e in padded_embeds]}")
+            # 尝试强制启用梯度
+            final_embeds = final_embeds.detach().requires_grad_(True)
+        
         # 生成position_ids：根据attention_mask计算累积位置
         # 关键：position_ids要反映实际的序列位置，考虑padding
         position_ids = torch.zeros_like(final_masks, dtype=torch.long)
@@ -573,5 +613,18 @@ class MEMModel(PreTrainedModel):
             labels=final_labels,
             **kwargs
         )
+        
+        # 调试：在第一次调用时打印梯度流信息
+        if not hasattr(self, '_debug_printed'):
+            self._debug_printed = True
+            print("\n" + "="*60)
+            print("梯度流检查:")
+            print(f"  final_embeds.requires_grad: {final_embeds.requires_grad}")
+            if hasattr(outputs, 'loss') and outputs.loss is not None:
+                print(f"  loss.requires_grad: {outputs.loss.requires_grad}")
+                print(f"  loss value: {outputs.loss.item():.4f}")
+            print(f"  proj.weight.requires_grad: {self.proj.weight.requires_grad}")
+            print(f"  proj.weight.grad: {self.proj.weight.grad}")
+            print("="*60 + "\n")
         
         return outputs
